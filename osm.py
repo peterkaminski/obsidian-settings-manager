@@ -2,7 +2,7 @@
 
 ################################################################
 #
-# osm.py - Obsidian Settings Manager v0.1.0
+# osm.py - Obsidian Settings Manager v0.2.0
 # Copyright 2021 Peter Kaminski. Licensed under MIT License.
 # https://github.com/peterkaminski/obsidian-settings-manager
 #
@@ -12,16 +12,19 @@ import argparse
 import datetime
 import json
 import shutil
+import subprocess
 import sys
 import traceback
 from pathlib import Path
 
 # set up argparse
 def init_argparse():
+    # TODO: make "action" flags (list, update, execute) mutually exclusive
     parser = argparse.ArgumentParser(description='Manage Obsidian settings across multiple vaults.')
     parser.add_argument('--list', '-l', action='store_true', help='list Obsidian vaults')
     parser.add_argument('--update', '-u', help='update Obsidian vaults from UPDATE vault')
     parser.add_argument('--rm', action='store_true', help='with --update, remove .obsidian and create again, rather than retain old .obsidian files')
+    parser.add_argument('--execute', '-x', help='run EXECUTE command within each vault (use caution!)')
     return parser
 
 # find all the vaults Obsidian is tracking
@@ -119,6 +122,10 @@ def main():
             # TODO: check if given UPDATE vault is really an Obsidian vault
             for vault_path in vault_paths:
                 copy_settings(Path.home() / args.update, vault_path, args)
+        elif args.execute:
+            for vault_path in vault_paths:
+                print(f'\n# {vault_path}\n')
+                subprocess.Popen(args.execute.split(), cwd=vault_path)
         else:
             argparser.print_help(sys.stderr)
 

@@ -1,4 +1,4 @@
-# Obsidian Settings Manager v0.1.0
+# Obsidian Settings Manager v0.2.0
 
 ## WARNING AND DISCLAIMER
 
@@ -16,6 +16,7 @@ In the current incarnation, it can:
 
 - list the vaults Obsidian knows about
 - copy the settings, plugins, and snippets from one vault to all the other vaults
+- execute a command within each vault
 
 Current notes and limitations:
 
@@ -45,6 +46,8 @@ pip install -r requirements.txt
 
 ## Operation
 
+### Help
+
 To run the utility:
 
 ```shell
@@ -53,11 +56,15 @@ To run the utility:
 
 Try it now.  With no arguments, or with `-h` or `--help`, a short usage summary is printed.
 
+### List Vaults
+
 To list Obsidian vaults, use `-l` or `--list`:
 
 ```shell
 ./osm.py --list
 ```
+
+### Update Vault Configuration
 
 To copy this files and directories from one Obsidian's `.obsidian` directory to all the other vaults, use `-u` or `--update`, with the directory name of the source vault after the flag:
 
@@ -78,6 +85,22 @@ The files and directories currently copied (as long as they exist in the source 
 - `snippets` - holds CSS snippets for customizing Obsidian's appearance
 - `README.md` - optional file used for vaults distributed to others via Git
 
+### Execute Command
+
+To execute a command within each vault, use `-x` or `--execute`:
+
+```shell
+./osm.py -x 'git status'
+```
+
+For each vault, a line like this is printed:
+
+```
+# My Vault
+```
+
+Any output from the command is printed after that line.
+
 ## Possible Enhancements
 
 Bug reports, enhancement suggestions, and pull requests are welcome at the [Obsidian Settings Manager repo](https://github.com/peterkaminski/obsidian-settings-manager).
@@ -90,7 +113,6 @@ Here are some possible enhancements already contemplated.
 - More optional verbosity about what the utility is doing and not doing.
 - Back up vaults to another location.
 - Back up vault configuration to another location.
-- Check Git status on vaults, and perhaps other Git operations (such as pull/commit all/push).
 - Output commands to run on the OS's CLI, rather than actually executing actions.
 
 ## MIT License
