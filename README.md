@@ -1,4 +1,4 @@
-# Obsidian Settings Manager v0.2.1
+# Obsidian Settings Manager v0.2.2
 
 ## WARNING AND DISCLAIMER
 
@@ -80,9 +80,10 @@ If you prefer, you can have the utility nuke the whole `.obsidian` directory, an
 
 The files and directories currently copied (as long as they exist in the source vault):
 
-- `config` - holds general settings and plugin settings
-- `plugins` - holds source code for community plugins
-- `snippets` - holds CSS snippets for customizing Obsidian's appearance
+- `config` - general settings and plugin settings
+- `starred.json` - which notes have been starred
+- `plugins` - source code and settings for community plugins
+- `snippets` - CSS snippets for customizing Obsidian's appearance
 - `README.md` - optional file used for vaults distributed to others via Git
 
 ### Execute Command

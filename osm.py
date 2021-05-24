@@ -2,7 +2,7 @@
 
 ################################################################
 #
-# osm.py - Obsidian Settings Manager v0.2.1
+# osm.py - Obsidian Settings Manager v0.2.2
 # Copyright 2021 Peter Kaminski. Licensed under MIT License.
 # https://github.com/peterkaminski/obsidian-settings-manager
 #
@@ -95,6 +95,9 @@ def copy_settings(src, dest, args):
 
     # copy config
     copy_settings_file(datestring, src, dest, 'config')
+
+    # copy starred.json
+    copy_settings_file(datestring, src, dest, 'starred.json')
 
     # copy file used for vaults distributed to others via git
     copy_settings_file(datestring, src, dest, 'README.md')
