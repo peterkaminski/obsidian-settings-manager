@@ -69,7 +69,7 @@ In this example, there is an Obsidian vault directory at `Vaults/obsidian-settin
 
 The default operation is to rename existing files so they have a date string appended, as a simple backup, to avoid data loss.  For example, the file `config` would be renamed to something like `config--2021-05-23T23:57:24.141428Z`.  Other files in the `.obsidian` directory are not affected.
 
-If you prefer, you can have the utility nuke the whole `.obsidian` directory, and then create a new empty directory, to copy files into.  This reduces the clutter of the backups, at the expense of losing everything in the directory (including, for instance, `workspace` settings).  Obsidian is good about recreating files it needs in the directory, but please use `--rm` only if you understand the implications.
+If you prefer, you can have the utility nuke the whole `.obsidian` directory, and then create a new empty directory, to copy files into.  This reduces the clutter of the backups, at the expense of losing everything in the directory (including, for instance, `workspace` settings).  Obsidian is good about recreating files it needs in the directory, but please use `--rm` only if you understand the implications. In particular, consider making a separate backup of important `config` files from customized vaults.
 
 The files and directories currently copied (as long as they exist in the source vault):
 
@@ -86,6 +86,7 @@ Here are some possible enhancements already contemplated.
 
 - List details of vault plugins, snippets, config.
 - More fine-grained control over which files and directories are copied, and which destination vaults they are copied to.
+- Option to merge config files, rather than replace.
 - More optional verbosity about what the utility is doing and not doing.
 - Back up vaults to another location.
 - Back up vault configuration to another location.
