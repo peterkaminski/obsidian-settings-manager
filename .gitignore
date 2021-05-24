@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# Emacs
+*~
+\#*\#
+
+# Python
+venv
