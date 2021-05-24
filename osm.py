@@ -2,7 +2,7 @@
 
 ################################################################
 #
-# osm.py - Obsidian Settings Manager v0.2.0
+# osm.py - Obsidian Settings Manager v0.2.1
 # Copyright 2021 Peter Kaminski. Licensed under MIT License.
 # https://github.com/peterkaminski/obsidian-settings-manager
 #
@@ -125,7 +125,8 @@ def main():
         elif args.execute:
             for vault_path in vault_paths:
                 print(f'\n# {vault_path}\n')
-                subprocess.Popen(args.execute.split(), cwd=vault_path)
+                p = subprocess.Popen(args.execute, cwd=vault_path, shell=True)
+                p.wait()
         else:
             argparser.print_help(sys.stderr)
 
