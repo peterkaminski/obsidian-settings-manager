@@ -1,4 +1,4 @@
-# Obsidian Settings Manager v0.2.2
+# Obsidian Settings Manager v0.3.0
 
 ## WARNING AND DISCLAIMER
 
@@ -14,13 +14,14 @@ This utility helps you manage [Obsidian](https://obsidian.md) settings (includin
 
 In the current incarnation, it can:
 
-- list the vaults Obsidian knows about
-- copy the settings, plugins, and snippets from one vault to all the other vaults
-- execute a command within each vault
+- List the vaults Obsidian knows about.
+- Copy the settings, plugins, and snippets from one vault to all the other vaults.
+- Execute a command within each vault.
+- List or remove backup files from the `.obsidian` directory.
 
 Current notes and limitations:
 
-- First release, no significant testing yet.
+- Early release, no significant testing yet.
 - No options for specifying particular destination directories to copy to or to ignore.  In future versions, there may be more options providing more fine-grained control.
 - No options for changing which files and directories are copied and which are ignored.  In future versions, there may be more options providing more fine-grained control.
 - Mac only (although Windows and Linux wouldn't be too hard).
@@ -56,6 +57,14 @@ To run the utility:
 
 Try it now.  With no arguments, or with `-h` or `--help`, a short usage summary is printed.
 
+### Show Version
+
+To show the version of the application, use `-v` or `--version`:
+
+```shell
+./osm.py -v
+```
+
 ### List Vaults
 
 To list Obsidian vaults, use `-l` or `--list`:
@@ -74,7 +83,7 @@ To copy this files and directories from one Obsidian's `.obsidian` directory to 
 
 In this example, there is an Obsidian vault directory at `Vaults/obsidian-settings`, and its `.obsidian` files and directories are copied to all the other vaults.  (Pro tip: consider making a vault with a simple name like `obsidian-settings` for the sole purpose of setting up your Obsidian configuration.)
 
-The default operation is to rename existing files so they have a date string appended, as a simple backup, to avoid data loss.  For example, the file `config` would be renamed to something like `config--2021-05-23T23:57:24.141428Z`.  Other files in the `.obsidian` directory are not affected.
+The default operation is to rename existing files so they have a date string appended, as a simple backup, to avoid data loss.  For example, the file `config` would be renamed to something like `config-2021-05-23T23:57:24.141428Z`.  Other files in the `.obsidian` directory are not affected.
 
 If you prefer, you can have the utility nuke the whole `.obsidian` directory, and then create a new empty directory, to copy files into.  This reduces the clutter of the backups, at the expense of losing everything in the directory (including, for instance, `workspace` settings).  Obsidian is good about recreating files it needs in the directory, but please use `--rm` only if you understand the implications. In particular, consider making a separate backup of important `config` files from customized vaults.
 
@@ -102,6 +111,28 @@ For each vault, a line like this is printed:
 
 Any output from the command is printed after that line.
 
+### List ISO 8601-formatted .obsidian Backup Files
+
+The `--update` command leaves backup files in the `.obsidian` directory with an ISO 8601-style date appended.  For example, this is a backup `config` file: `config-2021-05-23T23:57:24.141428Z`.
+
+To list all of these files, use `--backup-list`:
+
+```shell
+./osm.py --backup-list
+```
+
+### Remove ISO 8601-formatted .obsidian Backup Files
+
+The `--update` command leaves backup files in the `.obsidian` directory with an ISO 8601-style date appended.  For example, this is a backup `config` file: `config-2021-05-23T23:57:24.141428Z`.
+
+To remove all of these files, use `--backup-list`:
+
+```shell
+./osm.py --backup-remove
+```
+
+There is no undo for this operation. Consider using `--backup-list` before `--backup-remove` to double check that the files found are okay to remove.
+
 ## Possible Enhancements
 
 Bug reports, enhancement suggestions, and pull requests are welcome at the [Obsidian Settings Manager repo](https://github.com/peterkaminski/obsidian-settings-manager).
@@ -110,6 +141,8 @@ Here are some possible enhancements already contemplated.
 
 - List details of vault plugins, snippets, config.
 - More fine-grained control over which files and directories are copied, and which destination vaults they are copied to.
+  - Use `--input` / `-i` to specify a file that contains vault paths, instead of reading the vault paths from Obsidian.
+  - Use `--config` / `-c` to specify a YAML file which specifies which files and directories to copy.
 - Option to merge config files, rather than replace.
 - More optional verbosity about what the utility is doing and not doing.
 - Back up vaults to another location.

@@ -2,11 +2,14 @@
 
 ################################################################
 #
-# osm.py - Obsidian Settings Manager v0.2.2
+# osm.py - Obsidian Settings Manager
 # Copyright 2021 Peter Kaminski. Licensed under MIT License.
 # https://github.com/peterkaminski/obsidian-settings-manager
 #
 ################################################################
+
+VERSION = 'v0.3.0'
+APPNAME = 'Obsidian Settings Manager'
 
 import argparse
 import datetime
@@ -19,12 +22,15 @@ from pathlib import Path
 
 # set up argparse
 def init_argparse():
-    # TODO: make "action" flags (list, update, execute) mutually exclusive
+    # TODO: make "action" flags (list, update, execute, etc.) mutually exclusive
     parser = argparse.ArgumentParser(description='Manage Obsidian settings across multiple vaults.')
     parser.add_argument('--list', '-l', action='store_true', help='list Obsidian vaults')
     parser.add_argument('--update', '-u', help='update Obsidian vaults from UPDATE vault')
     parser.add_argument('--rm', action='store_true', help='with --update, remove .obsidian and create again, rather than retain old .obsidian files')
     parser.add_argument('--execute', '-x', help='run EXECUTE command within each vault (use caution!)')
+    parser.add_argument('--backup-list', action='store_true', help='list ISO 8601-formatted .obsidian backup files from all vaults')
+    parser.add_argument('--backup-remove', action='store_true', help='remove ISO 8601-formatted .obsidian backup files from all vaults')
+    parser.add_argument('--version', '-v', action='store_true', help='show version and exit')
     return parser
 
 # find all the vaults Obsidian is tracking
@@ -108,6 +114,18 @@ def copy_settings(src, dest, args):
     # copy snippets
     copy_settings_dir(datestring, src, dest, 'snippets')
 
+def backup_list_remove(vault_path, args):
+    dir_path = Path(vault_path) / '.obsidian'
+    iso_8601_glob = '*-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9]*Z'
+    for dest in dir_path.glob(iso_8601_glob):
+        if args.backup_list:
+            print(dest)
+        elif args.backup_remove:
+            if dest.is_file():
+                dest.unlink()
+            elif dest.is_dir():
+                shutil.rmtree(str(dest), ignore_errors=True)
+
 def main():
     # set up argparse
     argparser = init_argparse();
@@ -118,13 +136,18 @@ def main():
         vault_paths = get_vault_paths()
 
         # decide what to do
-        if args.list:
+        if args.version:
+            print(f'{APPNAME} {VERSION}')
+        elif args.list:
             for vault_path in vault_paths:
                 print(Path(vault_path).relative_to(Path.home()))
         elif args.update:
             # TODO: check if given UPDATE vault is really an Obsidian vault
             for vault_path in vault_paths:
                 copy_settings(Path.home() / args.update, vault_path, args)
+        elif args.backup_list or args.backup_remove:
+            for vault_path in vault_paths:
+                backup_list_remove(vault_path, args)
         elif args.execute:
             for vault_path in vault_paths:
                 print(f'\n# {vault_path}\n')
