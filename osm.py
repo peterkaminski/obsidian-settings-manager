@@ -53,16 +53,13 @@ def get_vault_paths(root_dir):
         print(e)
         exit(-1)
 
-    vaults = obsidian['vaults']
-    for vault_data in vaults.values():
+    for vault_data in obsidian['vaults'].values():
         # skip Help or other system directory vaults
         if Path(vault_data['path']).parent == root_dir:
             continue
         vault_paths.append(vault_data['path'])
 
-    vault_paths.sort(key=str.lower)
-
-    return vault_paths
+    return sorted(vault_paths, key=str.lower)
 
 # helper for `copy_settings()`
 # does nothing if `src` does not exist
