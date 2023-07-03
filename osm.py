@@ -42,14 +42,17 @@ def init_argparse():
 def get_vault_paths(root_dir):
     vault_paths = []
 
+    root_dir = Path(root_dir)
+    config_file = root_dir / 'obsidian.json'
+
     # read primary file
-    with open(Path(root_dir) / 'obsidian.json') as infile:
+    with open(config_file) as infile:
         obsidian = json.load(infile)
         vaults = obsidian['vaults']
         for vault in vaults:
             # skip Help or other system directory vaults
             # TODO: support other OSes
-            if Path(vaults[vault]['path']).parent == Path(root_dir):
+            if Path(vaults[vault]['path']).parent == root_dir:
                 continue
             vault_paths.append(vaults[vault]['path'])
 
