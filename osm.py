@@ -8,7 +8,7 @@
 #
 ################################################################
 
-VERSION = 'v0.3.0'
+VERSION = 'v0.3.1'
 APPNAME = 'Obsidian Settings Manager'
 
 import argparse
