@@ -14,11 +14,15 @@ APPNAME = 'Obsidian Settings Manager'
 import argparse
 import datetime
 import json
+import os
 import shutil
 import subprocess
 import sys
 import traceback
 from pathlib import Path
+
+DEFAULT_OBSIDIAN_ROOT = str(Path.home() / 'Library' / 'Application Support' / 'obsidian')
+OBSIDIAN_ROOT_DIR = os.getenv("OBSIDIAN_ROOT", DEFAULT_OBSIDIAN_ROOT)
 
 # set up argparse
 def init_argparse():
@@ -30,23 +34,22 @@ def init_argparse():
     parser.add_argument('--execute', '-x', help='run EXECUTE command within each vault (use caution!)')
     parser.add_argument('--backup-list', action='store_true', help='list ISO 8601-formatted .obsidian backup files from all vaults')
     parser.add_argument('--backup-remove', action='store_true', help='remove ISO 8601-formatted .obsidian backup files from all vaults')
+    parser.add_argument('--root', default=OBSIDIAN_ROOT_DIR, help=f'Use an alternative Obsidian Root Directory (default {OBSIDIAN_ROOT_DIR!r})')
     parser.add_argument('--version', '-v', action='store_true', help='show version and exit')
     return parser
 
 # find all the vaults Obsidian is tracking
-def get_vault_paths():
+def get_vault_paths(root_dir):
     vault_paths = []
 
     # read primary file
-    # location per https://help.obsidian.md/Advanced+topics/How+Obsidian+stores+data#System+directory
-    # (TODO: should be parameterized and support other OSes)
-    with open(Path.home() / 'Library/Application Support/obsidian/obsidian.json') as infile:
+    with open(Path(root_dir) / 'obsidian.json') as infile:
         obsidian = json.load(infile)
         vaults = obsidian['vaults']
         for vault in vaults:
             # skip Help or other system directory vaults
             # TODO: support other OSes
-            if Path(vaults[vault]['path']).parent == Path.home() / 'Library/Application Support/obsidian':
+            if Path(vaults[vault]['path']).parent == Path(root_dir):
                 continue
             vault_paths.append(vaults[vault]['path'])
 
@@ -133,7 +136,7 @@ def main():
 
     # do stuff
     try:
-        vault_paths = get_vault_paths()
+        vault_paths = get_vault_paths(args.root)
 
         # decide what to do
         if args.version:
