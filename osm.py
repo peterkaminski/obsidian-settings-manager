@@ -54,11 +54,11 @@ def get_vault_paths(root_dir):
         exit(-1)
 
     vaults = obsidian['vaults']
-    for vault in vaults:
+    for vault_data in vaults.values():
         # skip Help or other system directory vaults
-        if Path(vaults[vault]['path']).parent == root_dir:
+        if Path(vault_data['path']).parent == root_dir:
             continue
-        vault_paths.append(vaults[vault]['path'])
+        vault_paths.append(vault_data['path'])
 
     vault_paths.sort(key=str.lower)
 
