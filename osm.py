@@ -48,16 +48,17 @@ def get_vault_paths(root_dir):
     # read primary file
     with open(config_file) as infile:
         obsidian = json.load(infile)
-        vaults = obsidian['vaults']
-        for vault in vaults:
-            # skip Help or other system directory vaults
-            # TODO: support other OSes
-            if Path(vaults[vault]['path']).parent == root_dir:
-                continue
-            vault_paths.append(vaults[vault]['path'])
 
-        # sort paths (case-insensitive)
-        vault_paths.sort(key=str.lower)
+    vaults = obsidian['vaults']
+    for vault in vaults:
+        # skip Help or other system directory vaults
+        # TODO: support other OSes
+        if Path(vaults[vault]['path']).parent == root_dir:
+            continue
+        vault_paths.append(vaults[vault]['path'])
+
+    # sort paths (case-insensitive)
+    vault_paths.sort(key=str.lower)
 
     # return paths
     return vault_paths
