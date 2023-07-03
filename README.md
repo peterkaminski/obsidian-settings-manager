@@ -1,4 +1,4 @@
-# Obsidian Settings Manager v0.3.0
+# Obsidian Settings Manager v0.3.1
 
 ## WARNING AND DISCLAIMER
 
@@ -148,6 +148,13 @@ Here are some possible enhancements already contemplated.
 - Back up vaults to another location.
 - Back up vault configuration to another location.
 - Output commands to run on the OS's CLI, rather than actually executing actions.
+
+## Contributors
+
+Obsidian Settings Manager is open source. Pull requests and suggestions are gratefully received. Thank you to the following contributors!
+
+- Peter Kaminski, [github/@peterkaminski](https://github.com/peterkaminski/)
+- Doug Philips, [github/@dgou](https://github.com/dgou)
 
 ## MIT License
 
