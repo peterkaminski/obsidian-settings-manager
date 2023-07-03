@@ -45,9 +45,13 @@ def get_vault_paths(root_dir):
     root_dir = Path(root_dir)
     config_file = root_dir / 'obsidian.json'
 
-    # read primary file
-    with open(config_file) as infile:
-        obsidian = json.load(infile)
+    try:
+        with open(config_file) as infile:
+            obsidian = json.load(infile)
+    except Exception as e:
+        print('Unable to load Obsidian config file:', config_file)
+        print(e)
+        exit(-1)
 
     vaults = obsidian['vaults']
     for vault in vaults:
