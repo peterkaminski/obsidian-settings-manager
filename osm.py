@@ -38,6 +38,27 @@ def init_argparse():
     parser.add_argument('--version', '-v', action='store_true', help='show version and exit')
     return parser
 
+def safe_load_config(config_file):
+    """Return the parsed JSON from config_file, or exit with an error message if open/parse fails."""
+    try:
+        with open(config_file) as infile:
+            return json.load(infile)
+    except Exception as e:
+        print('Unable to load Obsidian config file:', config_file)
+        print(e)
+        exit(-1)
+
+def is_user_path(root_dir, path_to_test):
+    """Return True if path_to_test is a user's path, not an Obsidian system path (such as Help, etc)"""
+    return Path(path_to_test).parent != root_dir
+
+def user_vault_paths_from(obsidian, root_dir):
+    """Return the paths for each vault in obsidian that isn't a system vault."""
+    # The vaults' dictionary's keys aren't of any use/interest to us,
+    # so we only need to look the path defined in the vault.
+    return [vault_data['path'] for vault_data in obsidian['vaults'].values()
+            if is_user_path(root_dir, vault_data['path'])]
+    
 # find all the vaults Obsidian is tracking
 def get_vault_paths(root_dir):
     vault_paths = []
