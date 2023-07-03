@@ -125,7 +125,7 @@ To list all of these files, use `--backup-list`:
 
 The `--update` command leaves backup files in the `.obsidian` directory with an ISO 8601-style date appended.  For example, this is a backup `config` file: `config-2021-05-23T23:57:24.141428Z`.
 
-To remove all of these files, use `--backup-list`:
+To remove all of these files, use `--backup-remove`:
 
 ```shell
 ./osm.py --backup-remove
