@@ -61,18 +61,9 @@ def user_vault_paths_from(obsidian, root_dir):
     
 # find all the vaults Obsidian is tracking
 def get_vault_paths(root_dir):
-    vault_paths = []
-
     root_dir = Path(root_dir)
-    obsidian = safe_load_config(config_file = root_dir / 'obsidian.json')
-
-    for vault_data in obsidian['vaults'].values():
-        # skip Help or other system directory vaults
-        if Path(vault_data['path']).parent == root_dir:
-            continue
-        vault_paths.append(vault_data['path'])
-
-    return sorted(vault_paths, key=str.lower)
+    obsidian = safe_load_config(root_dir / 'obsidian.json')
+    return sorted(user_vault_paths_from(obsidian, root_dir), key=str.lower)
 
 # helper for `copy_settings()`
 # does nothing if `src` does not exist
