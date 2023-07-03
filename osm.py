@@ -8,17 +8,21 @@
 #
 ################################################################
 
-VERSION = 'v0.3.0'
+VERSION = 'v0.3.1'
 APPNAME = 'Obsidian Settings Manager'
 
 import argparse
 import datetime
 import json
+import os
 import shutil
 import subprocess
 import sys
 import traceback
 from pathlib import Path
+
+DEFAULT_OBSIDIAN_ROOT = str(Path.home() / 'Library' / 'Application Support' / 'obsidian')
+OBSIDIAN_ROOT_DIR = os.getenv("OBSIDIAN_ROOT", DEFAULT_OBSIDIAN_ROOT)
 
 # set up argparse
 def init_argparse():
@@ -30,31 +34,36 @@ def init_argparse():
     parser.add_argument('--execute', '-x', help='run EXECUTE command within each vault (use caution!)')
     parser.add_argument('--backup-list', action='store_true', help='list ISO 8601-formatted .obsidian backup files from all vaults')
     parser.add_argument('--backup-remove', action='store_true', help='remove ISO 8601-formatted .obsidian backup files from all vaults')
+    parser.add_argument('--root', default=OBSIDIAN_ROOT_DIR, help=f'Use an alternative Obsidian Root Directory (default {OBSIDIAN_ROOT_DIR!r})')
     parser.add_argument('--version', '-v', action='store_true', help='show version and exit')
     return parser
 
+def safe_load_config(config_file):
+    """Return the parsed JSON from config_file, or exit with an error message if open/parse fails."""
+    try:
+        with open(config_file) as infile:
+            return json.load(infile)
+    except Exception as e:
+        print('Unable to load Obsidian config file:', config_file)
+        print(e)
+        exit(-1)
+
+def is_user_path(root_dir, path_to_test):
+    """Return True if path_to_test is a user's path, not an Obsidian system path (such as Help, etc)"""
+    return Path(path_to_test).parent != root_dir
+
+def user_vault_paths_from(obsidian, root_dir):
+    """Return the paths for each vault in obsidian that isn't a system vault."""
+    # The vaults' dictionary's keys aren't of any use/interest to us,
+    # so we only need to look the path defined in the vault.
+    return [vault_data['path'] for vault_data in obsidian['vaults'].values()
+            if is_user_path(root_dir, vault_data['path'])]
+    
 # find all the vaults Obsidian is tracking
-def get_vault_paths():
-    vault_paths = []
-
-    # read primary file
-    # location per https://help.obsidian.md/Advanced+topics/How+Obsidian+stores+data#System+directory
-    # (TODO: should be parameterized and support other OSes)
-    with open(Path.home() / 'Library/Application Support/obsidian/obsidian.json') as infile:
-        obsidian = json.load(infile)
-        vaults = obsidian['vaults']
-        for vault in vaults:
-            # skip Help or other system directory vaults
-            # TODO: support other OSes
-            if Path(vaults[vault]['path']).parent == Path.home() / 'Library/Application Support/obsidian':
-                continue
-            vault_paths.append(vaults[vault]['path'])
-
-        # sort paths (case-insensitive)
-        vault_paths.sort(key=str.lower)
-
-    # return paths
-    return vault_paths
+def get_vault_paths(root_dir):
+    root_dir = Path(root_dir)
+    obsidian = safe_load_config(root_dir / 'obsidian.json')
+    return sorted(user_vault_paths_from(obsidian, root_dir), key=str.lower)
 
 # helper for `copy_settings()`
 # does nothing if `src` does not exist
@@ -133,7 +142,7 @@ def main():
 
     # do stuff
     try:
-        vault_paths = get_vault_paths()
+        vault_paths = get_vault_paths(args.root)
 
         # decide what to do
         if args.version:
