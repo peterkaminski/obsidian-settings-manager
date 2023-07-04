@@ -187,7 +187,7 @@ def copy_settings_item(suffix, src, dest, itemname):
 # `dest` is backed up to same filename with a ISO 8601-style
 # date string ('2021-05-23T23:38:32.509386Z') in UTC appended,
 # unless `--rm` is given
-def copy_settings(src, dest, args):
+def copy_settings(dest, src, args):
     src = Path(src)
     dest = Path(dest)
     # don't operate on self
@@ -244,7 +244,7 @@ def main():
         elif args.update:
             ensure_valid_vault(vault_paths, args.update)
             for vault_path in vault_paths:
-                copy_settings(Path.home() / args.update, vault_path, args)
+                copy_settings(vault_path, Path.home() / args.update, args)
         elif args.backup_list:
             call_for_each_vault(vault_paths, backup_list_operation, print)
         elif args.backup_remove:
