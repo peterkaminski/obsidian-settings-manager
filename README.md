@@ -1,4 +1,4 @@
-# Obsidian Settings Manager v0.3.1
+# Obsidian Settings Manager v0.3.2
 
 ## WARNING AND DISCLAIMER
 
@@ -16,6 +16,8 @@ In the current incarnation, it can:
 
 - List the vaults Obsidian knows about.
 - Copy the settings, plugins, and snippets from one vault to all the other vaults.
+- Dry-run option to see what it woud do but not do it.
+- Show a diff of what would change if a copy was done.
 - Execute a command within each vault.
 - List or remove backup files from the `.obsidian` directory.
 
@@ -24,7 +26,7 @@ Current notes and limitations:
 - Early release, no significant testing yet.
 - No options for specifying particular destination directories to copy to or to ignore.  In future versions, there may be more options providing more fine-grained control.
 - No options for changing which files and directories are copied and which are ignored.  In future versions, there may be more options providing more fine-grained control.
-- Mac only (although Windows and Linux wouldn't be too hard).
+- Mac and Linux only (although Windows might not be too hard).
 - Command-line only.
 - Python 3 (tested with Python 3.8).
 
@@ -144,7 +146,6 @@ Here are some possible enhancements already contemplated.
   - Use `--input` / `-i` to specify a file that contains vault paths, instead of reading the vault paths from Obsidian.
   - Use `--config` / `-c` to specify a YAML file which specifies which files and directories to copy.
 - Option to merge config files, rather than replace.
-- More optional verbosity about what the utility is doing and not doing.
 - Back up vaults to another location.
 - Back up vault configuration to another location.
 - Output commands to run on the OS's CLI, rather than actually executing actions.
