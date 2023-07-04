@@ -233,7 +233,7 @@ def diff_settings(dest, src):
     if src.samefile(dest):
         return
 
-    print(f"Diffing '{dest}' configuration to '{src}'")
+    print(f"\n# Diffing '{dest}' configuration to '{src}'")
 
     src = src / '.obsidian'
     dest = dest / '.obsidian'
