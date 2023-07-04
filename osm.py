@@ -130,6 +130,13 @@ def remove_dir(dest):
         return
     shutil.rmtree(str(dest), ignore_errors=True)
 
+def execute_command(command, vault_path):
+    """Execute the given command in the given vault_path."""
+    if DRY_RUN:
+        verbose("Would run command:", repr(command))
+    else:
+        subprocess.run(command, cwd=vault_path, shell=True)
+
 def copy_settings_item(suffix, src, dest, itemname):
     """
     Copy itemname from src to dest.
@@ -223,10 +230,7 @@ def main():
         elif args.execute:
             for vault_path in vault_paths:
                 print(f'\n# {vault_path}\n')
-                if DRY_RUN:
-                    verbose("Would run command:", repr(args.execute))
-                else:
-                    subprocess.run(args.execute, cwd=vault_path, shell=True)
+                execute_command(args.execute, vault_path)
         else:
             argparser.print_help(sys.stderr)
 
