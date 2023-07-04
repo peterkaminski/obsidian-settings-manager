@@ -22,7 +22,7 @@ import traceback
 from pathlib import Path
 
 DEFAULT_OBSIDIAN_ROOT = str(Path.home() / 'Library' / 'Application Support' / 'obsidian')
-OBSIDIAN_ROOT_DIR = os.getenv("OBSIDIAN_ROOT", DEFAULT_OBSIDIAN_ROOT)
+OBSIDIAN_ROOT_DIR = os.getenv('OBSIDIAN_ROOT', DEFAULT_OBSIDIAN_ROOT)
 
 ITEMS_TO_COPY = [
     'config',
@@ -33,7 +33,7 @@ ITEMS_TO_COPY = [
 ]
 
 def datestring():
-    """Return the current date and time in UTC string format."""
+    '''Return the current date and time in UTC string format.'''
     return f'-{datetime.datetime.utcnow().isoformat()}Z'
 
 # Keep this in sync with the format returned by datestring()
@@ -45,7 +45,7 @@ VERBOSE = False
 DRY_RUN = False
 
 def verbose(*args, **kwargs):
-    """Print parameters if VERBOSE flag is True or DRY_RUN is True."""
+    '''Print parameters if VERBOSE flag is True or DRY_RUN is True.'''
     if DRY_RUN:
         print('DRY-RUN:' if args else '', *args, **kwargs)
     elif VERBOSE:
@@ -68,7 +68,7 @@ def init_argparse():
     return parser
 
 def safe_load_config(config_file):
-    """Return the parsed JSON from config_file, or exit with an error message if open/parse fails."""
+    '''Return the parsed JSON from config_file, or exit with an error message if open/parse fails.'''
     try:
         with open(config_file) as infile:
             return json.load(infile)
@@ -78,11 +78,11 @@ def safe_load_config(config_file):
         exit(-1)
 
 def is_user_path(root_dir, path_to_test):
-    """Return True if path_to_test is a user's path, not an Obsidian system path (such as Help, etc)"""
+    '''Return True if path_to_test is a user's path, not an Obsidian system path (such as Help, etc)'''
     return Path(path_to_test).parent != root_dir
 
 def user_vault_paths_from(obsidian, root_dir):
-    """Return the paths for each vault in obsidian that isn't a system vault."""
+    '''Return the paths for each vault in obsidian that isn't a system vault.'''
     # The vaults' dictionary's keys aren't of any use/interest to us,
     # so we only need to look the path defined in the vault.
     return [vault_data['path'] for vault_data in obsidian['vaults'].values()
@@ -97,56 +97,56 @@ def get_vault_paths(root_dir):
 # It might be cleaner to have this defined after the functions it calls,
 # but keeping it close to get_vault_paths to make it easier to track changes if needed.
 def ensure_valid_vault(vault_paths, vault_to_check):
-    """
+    '''
     Ensure that vault_to_check (relative path) is in the list of (absolute path) vault_paths.
 
     Only returns if it is, otherwise, print an error and exit.
-    """
+    '''
     if str(Path.home() / vault_to_check) in vault_paths:
         return
-    print(f"Error: {vault_to_check!r} is not one of your vaults:")
+    print(f'Error: {vault_to_check!r} is not one of your vaults:')
     call_for_each_vault(vault_paths, show_vault_path)
     exit(-1)
 
 def call_for_each_vault(vault_paths, operation, *args):
-    """Call operation with each vault in vault_paths, followed by *args."""
+    '''Call operation with each vault in vault_paths, followed by *args.'''
     for vault_path in vault_paths:
         operation(vault_path, *args)
 
 def backup(item, suffix):
-    """Rename item to have the given suffix."""
+    '''Rename item to have the given suffix.'''
     backup = str(item)+suffix
-    verbose("Saving current", item, "as", backup)
+    verbose('Saving current', item, 'as', backup)
     if DRY_RUN:
         return
     item.rename(backup)
 
 def copy_directory(src_target, dest_target):
-    """Copy the src_target directry to dest_target."""
-    verbose("Copying directory", src_target, "to", dest_target)
+    '''Copy the src_target directry to dest_target.'''
+    verbose('Copying directory', src_target, 'to', dest_target)
     if DRY_RUN:
         return
     shutil.copytree(src_target, dest_target)
 
 def copy_file(src_target, dest_target):
-    """Copy the src_target file to dest_target."""
-    verbose("Copying file", src_target, "to", dest_target)
+    '''Copy the src_target file to dest_target.'''
+    verbose('Copying file', src_target, 'to', dest_target)
     if DRY_RUN:
         return
     shutil.copy2(src_target, dest_target)
 
 def recreate_dir(dest):
-    """Delete and recreate the given directory."""
-    verbose("Removing and recreating", dest)
+    '''Delete and recreate the given directory.'''
+    verbose('Removing and recreating', dest)
     if DRY_RUN:
         return
     shutil.rmtree(dest, ignore_errors=True)
     dest.mkdir()
 
 def remove_item(dest):
-    """Remove the given item (file or directory)."""
+    '''Remove the given item (file or directory).'''
     is_dir = dest.is_dir()
-    verbose("Removing backup", "directory" if is_dir else "file", dest)
+    verbose('Removing backup', 'directory' if is_dir else 'file', dest)
     if DRY_RUN:
         return
     if is_dir:
@@ -155,21 +155,21 @@ def remove_item(dest):
         dest.unlink()
 
 def execute_command(vault_path, command):
-    """Execute the given command in the given vault_path."""
+    '''Execute the given command in the given vault_path.'''
     print(f'\n# {vault_path}\n')
     if DRY_RUN:
-        verbose("Would run command:", repr(command))
+        verbose('Would run command:', repr(command))
     else:
         subprocess.run(command, cwd=vault_path, shell=True)
 
 def copy_settings_item(suffix, src, dest, itemname):
-    """
+    '''
     Copy itemname from src to dest.
 
     itemname can be a file or a directory, if a directory it is recursively copied.
     If itemname already exists in dest, it is renamed with suffix appended.
     If itemname does not exist in src, nothing is done.
-    """
+    '''
 
     src_target = Path(src) / itemname
     dest_target = Path(dest) / itemname
@@ -184,14 +184,14 @@ def copy_settings_item(suffix, src, dest, itemname):
         copy_file(src_target, dest_target)
 
 def copy_settings(dest, src, clean_first):
-    """
+    '''
     Copy the usual settings items into dest vault from src.
 
     Items in `dest` are backed up to their same name with a ISO 8601-style
     date string ('2021-05-23T23:38:32.509386Z') in UTC appended,
     unless clean_first is True. (clean_first means everthing in dest's settings
     is deleted so there is nothing to back up.)
-    """
+    '''
     src = Path(src)
     dest = Path(dest)
     # don't operate on self
@@ -214,7 +214,7 @@ def copy_settings(dest, src, clean_first):
         copy_settings_item(suffix, src, dest, item)
 
 def backup_list_operation(vault_path, operation):
-    """Call operation with each backup item found in the given vault."""
+    '''Call operation with each backup item found in the given vault.'''
     dir_path = Path(vault_path) / '.obsidian'
     for dest in dir_path.glob(ISO_8601_GLOB):
         operation(dest)
@@ -259,5 +259,5 @@ def main():
     except Exception:
         traceback.print_exc()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     exit(main())
