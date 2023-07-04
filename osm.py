@@ -65,6 +65,26 @@ def get_vault_paths(root_dir):
     obsidian = safe_load_config(root_dir / 'obsidian.json')
     return sorted(user_vault_paths_from(obsidian, root_dir), key=str.lower)
 
+def copy_settings_item(suffix, src, dest, itemname):
+    """
+    Copy itemname from src to dest.
+
+    itemname can be a file or a directory, if a directory it is recursively copied.
+    If itemname already exists in dest, it is renamed with suffix appended.
+    If itemname does not exist in src, nothing is done.
+    """
+
+    src_target = Path(src) / itemname
+    dest_target = Path(dest) / itemname
+    if not src_target.exists():
+        return
+    if dest_target.exists():
+        dest_target.rename(str(dest_target)+suffix)
+    if src_target.is_dir():
+        shutil.copytree(src_target, dest_target)
+    else:
+        shutil.copy2(src_target, dest_target)
+
 # helper for `copy_settings()`
 # does nothing if `src` does not exist
 def copy_settings_file(datestring, src, dest, filename):
