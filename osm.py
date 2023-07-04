@@ -34,15 +34,20 @@ ITEMS_TO_COPY = [
 
 VERBOSE = False
 
+DRY_RUN = False
+
 def verbose(*args, **kwargs):
-    """Print parameters only if the global verbose flag is True."""
-    if VERBOSE:
+    """Print parameters if VERBOSE flag is True or DRY_RUN is True."""
+    if DRY_RUN:
+        print('DRY-RUN:' if args else '', *args, **kwargs)
+    elif VERBOSE:
         print(*args, **kwargs)
 
 # set up argparse
 def init_argparse():
     parser = argparse.ArgumentParser(description='Manage Obsidian settings across multiple vaults.')
     parser.add_argument('--verbose', action='store_true', help='Print what the file system operations are happening')
+    parser.add_argument('--dry-run', '-n', action='store_true', help='Do a dry-run. Show what would be done, without doing it.')
     parser.add_argument('--root', default=OBSIDIAN_ROOT_DIR, help=f'Use an alternative Obsidian Root Directory (default {OBSIDIAN_ROOT_DIR!r})')
     parser.add_argument('--rm', action='store_true', help='with --update, remove .obsidian and create again, rather than retain old .obsidian files')
     only_one_of = parser.add_mutually_exclusive_group(required=True)
@@ -85,32 +90,44 @@ def backup(item, suffix):
     """Rename item to have the given suffix."""
     backup = str(item)+suffix
     verbose("Saving current", item, "as", backup)
+    if DRY_RUN:
+        return
     item.rename(backup)
 
 def copy_directory(src_target, dest_target):
     """Copy the src_target directry to dest_target."""
     verbose("Copying directory", src_target, "to", dest_target)
+    if DRY_RUN:
+        return
     shutil.copytree(src_target, dest_target)
 
 def copy_file(src_target, dest_target):
     """Copy the src_target file to dest_target."""
     verbose("Copying file", src_target, "to", dest_target)
+    if DRY_RUN:
+        return
     shutil.copy2(src_target, dest_target)
 
 def recreate_dir(dest):
     """Delete and recreate the given directory."""
     verbose("Removing and recreating", dest)
+    if DRY_RUN:
+        return
     shutil.rmtree(dest, ignore_errors=True)
     dest.mkdir()
 
 def remove_file(dest):
     """Remove the given file."""
     verbose("Removing backup file", dest)
+    if DRY_RUN:
+        return
     dest.unlink()
 
 def remove_dir(dest):
     """Remove the given directory."""
     verbose("Removing backup directory", dest)
+    if DRY_RUN:
+        return
     shutil.rmtree(str(dest), ignore_errors=True)
 
 def copy_settings_item(suffix, src, dest, itemname):
@@ -182,6 +199,10 @@ def main():
         global VERBOSE
         VERBOSE = True
 
+    if args.dry_run:
+        global DRY_RUN
+        DRY_RUN = True
+
     # do stuff
     try:
         vault_paths = get_vault_paths(args.root)
@@ -202,7 +223,10 @@ def main():
         elif args.execute:
             for vault_path in vault_paths:
                 print(f'\n# {vault_path}\n')
-                subprocess.run(args.execute, cwd=vault_path, shell=True)
+                if DRY_RUN:
+                    verbose("Would run command:", repr(args.execute))
+                else:
+                    subprocess.run(args.execute, cwd=vault_path, shell=True)
         else:
             argparser.print_help(sys.stderr)
 
