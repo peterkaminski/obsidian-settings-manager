@@ -126,6 +126,8 @@ def call_for_each_vault(vault_paths, operation, *args):
 
 def backup(item, suffix):
     '''Rename item to have the given suffix.'''
+    if DIFF_CMD:
+        return
     backup = str(item)+suffix
     verbose('Saving current', item, 'as', backup)
     if DRY_RUN:
@@ -134,17 +136,25 @@ def backup(item, suffix):
 
 def copy_directory(src_target, dest_target):
     '''Copy the src_target directry to dest_target.'''
-    verbose('Copying directory', src_target, 'to', dest_target)
+    msg = 'Diffing' if DIFF_CMD else 'Copying'
+    verbose(msg, 'directory', src_target, 'to', dest_target)
     if DRY_RUN:
         return
-    shutil.copytree(src_target, dest_target)
+    if DIFF_CMD:
+        subprocess.run([DIFF_CMD, '-r', src_target, dest_target])
+    else:
+        shutil.copytree(src_target, dest_target)
 
 def copy_file(src_target, dest_target):
     '''Copy the src_target file to dest_target.'''
-    verbose('Copying file', src_target, 'to', dest_target)
+    msg = 'Diffing' if DIFF_CMD else 'Copying'
+    verbose(msg, 'file', src_target, 'to', dest_target)
     if DRY_RUN:
         return
-    shutil.copy2(src_target, dest_target)
+    if DIFF_CMD:
+        subprocess.run([DIFF_CMD, src_target, dest_target])
+    else:
+        shutil.copy2(src_target, dest_target)
 
 def recreate_dir(dest):
     '''Delete and recreate the given directory.'''
@@ -209,7 +219,8 @@ def copy_settings(dest, src, clean_first):
     if src.samefile(dest):
         return
 
-    print(f"Copying '{src}' configuration to '{dest}'")
+    msg = 'Diffing' if DIFF_CMD else 'Copying'
+    print(f"{msg} '{src}' configuration to '{dest}'")
 
     src = src / '.obsidian'
     dest = dest / '.obsidian'
