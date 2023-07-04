@@ -183,11 +183,15 @@ def copy_settings_item(suffix, src, dest, itemname):
     else:
         copy_file(src_target, dest_target)
 
-# copy the usual settings files from `src` to `dest`
-# `dest` is backed up to same filename with a ISO 8601-style
-# date string ('2021-05-23T23:38:32.509386Z') in UTC appended,
-# unless `--rm` is given
-def copy_settings(dest, src, args):
+def copy_settings(dest, src, clean_first):
+    """
+    Copy the usual settings items into dest vault from src.
+
+    Items in `dest` are backed up to their same name with a ISO 8601-style
+    date string ('2021-05-23T23:38:32.509386Z') in UTC appended,
+    unless clean_first is True. (clean_first means everthing in dest's settings
+    is deleted so there is nothing to back up.)
+    """
     src = Path(src)
     dest = Path(dest)
     # don't operate on self
@@ -203,8 +207,7 @@ def copy_settings(dest, src, args):
     # Use a timestamp for the suffix for uniqueness
     suffix = datestring()
 
-    # if --rm, remove and recreate .obsidian
-    if args.rm:
+    if clean_first:
         recreate_dir(dest)
 
     for item in ITEMS_TO_COPY:
@@ -243,7 +246,7 @@ def main():
             call_for_each_vault(vault_paths, show_vault_path)
         elif args.update:
             ensure_valid_vault(vault_paths, args.update)
-            call_for_each_vault(copy_settings, Path.home() / args.update, args)
+            call_for_each_vault(vault_paths, copy_settings, Path.home() / args.update, args.rm)
         elif args.backup_list:
             call_for_each_vault(vault_paths, backup_list_operation, print)
         elif args.backup_remove:
