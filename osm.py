@@ -44,6 +44,12 @@ VERBOSE = False
 
 DRY_RUN = False
 
+DIFF_CMD = ''
+'''
+When not '', it is set to the absolute path of the diff command to use
+and the copy commands used by `update` will do a diff instead.
+'''
+
 def verbose(*args, **kwargs):
     '''Print parameters if VERBOSE flag is True or DRY_RUN is True.'''
     if DRY_RUN:
@@ -61,6 +67,7 @@ def init_argparse():
     only_one_of = parser.add_mutually_exclusive_group(required=True)
     only_one_of.add_argument('--list', '-l', action='store_true', help='list Obsidian vaults')
     only_one_of.add_argument('--update', '-u', help='update Obsidian vaults from UPDATE vault')
+    only_one_of.add_argument('--diff-to', '-d', help='Like update but instead of copying, just show a diff against DIFF_TO instead (no changes made).')
     only_one_of.add_argument('--execute', '-x', help='run EXECUTE command within each vault (use caution!)')
     only_one_of.add_argument('--backup-list', action='store_true', help='list ISO 8601-formatted .obsidian backup files from all vaults')
     only_one_of.add_argument('--backup-remove', action='store_true', help='remove ISO 8601-formatted .obsidian backup files from all vaults')
@@ -238,6 +245,13 @@ def main():
         global DRY_RUN
         DRY_RUN = True
 
+    if args.diff_to:
+        global DIFF_CMD
+        DIFF_CMD = shutil.which('diff')
+        if not DIFF_CMD:
+            print("Error: Cannot locate the 'diff' command, aborting.")
+            exit(-1)
+
     try:
         vault_paths = get_vault_paths(args.root)
 
@@ -248,6 +262,10 @@ def main():
         elif args.update:
             ensure_valid_vault(vault_paths, args.update)
             call_for_each_vault(vault_paths, copy_settings, Path.home() / args.update, args.rm)
+        elif args.diff_to:
+            ensure_valid_vault(vault_paths, args.diff_to)
+            # Note: By setting DIFF_CMD above, we can re-use the copy_settings helper.
+            call_for_each_vault(vault_paths, copy_settings, Path.home() / args.diff_to, False)
         elif args.backup_list:
             call_for_each_vault(vault_paths, backup_list_operation, print)
         elif args.backup_remove:
