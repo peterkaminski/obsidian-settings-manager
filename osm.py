@@ -27,7 +27,7 @@ OBSIDIAN_ROOT_DIR = os.getenv('OBSIDIAN_ROOT', DEFAULT_OBSIDIAN_ROOT)
 ITEMS_TO_COPY = [
     'config',
     'starred.json',
-    'README.md', # used for vaults distributed to others via git
+    'README.md',  # used for vaults distributed to others via git
     'plugins',
     'snippets',
 ]
@@ -87,7 +87,7 @@ def user_vault_paths_from(obsidian, root_dir):
     # so we only need to look the path defined in the vault.
     return [vault_data['path'] for vault_data in obsidian['vaults'].values()
             if is_user_path(root_dir, vault_data['path'])]
-    
+
 # find all the vaults Obsidian is tracking
 def get_vault_paths(root_dir):
     root_dir = Path(root_dir)
@@ -224,8 +224,8 @@ def show_vault_path(vault_path):
 
 def main():
     # set up argparse
-    argparser = init_argparse();
-    args = argparser.parse_args();
+    argparser = init_argparse()
+    args = argparser.parse_args()
 
     if args.verbose:
         global VERBOSE
