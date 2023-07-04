@@ -196,13 +196,11 @@ def copy_settings(src, dest, args):
     for item in ITEMS_TO_COPY:
         copy_settings_item(suffix, src, dest, item)
 
-def backup_list_remove(vault_path, args):
+def backup_list_operation(vault_path, operation):
+    """Call operation with each backup item found in the given vault."""
     dir_path = Path(vault_path) / '.obsidian'
     for dest in dir_path.glob(ISO_8601_GLOB):
-        if args.backup_list:
-            print(dest)
-        elif args.backup_remove:
-            remove_item(dest)
+        operation(dest)
 
 def main():
     # set up argparse
@@ -231,8 +229,10 @@ def main():
             # TODO: check if given UPDATE vault is really an Obsidian vault
             for vault_path in vault_paths:
                 copy_settings(Path.home() / args.update, vault_path, args)
-        elif args.backup_list or args.backup_remove:
-            call_for_each_vault(vault_paths, backup_list_remove, args)
+        elif args.backup_list:
+            call_for_each_vault(vault_paths, backup_list_operation, print)
+        elif args.backup_remove:
+            call_for_each_vault(vault_paths, backup_list_operation, remove_item)
         elif args.execute:
             call_for_each_vault(vault_paths, execute_command, args.execute)
         else:
