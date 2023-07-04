@@ -253,7 +253,14 @@ def diff_settings(dest, src):
         dest_item = dest / item
         src_item = src / item
         if src_item.exists() and dest_item.exists():
+            print()
             do_diff(dest_item, src_item)
+        elif src_item.exists():
+            print(f"\n## '{dest_item}' doesn't exist; it would be copied from '{src_item}' on '--update'.")
+        elif dest_item.exists():
+            print(f"\n## '{dest_item}' would be removed with `--update --rm` because '{src_item}' doesn't exist.")
+        # If neither exist, nothing to do, nothing to say. Move along.
+
 
 def backup_list_operation(vault_path, operation):
     '''Call operation with each backup item found in the given vault.'''
