@@ -16,10 +16,10 @@ In the current incarnation, it can:
 
 - List the vaults Obsidian knows about.
 - Copy the settings, plugins, and snippets from one vault to all the other vaults.
-- Dry-run option to see what it woud do but not do it.
-- Show a diff of what would change if a copy was done.
+- Dry-run commands to see what they would do, without doing it.
+- Show a diff of what would change if a copy were done.
 - Execute a command within each vault.
-- List or remove backup files from the `.obsidian` directory.
+- List or remove backup files from the `.obsidian` directory of all vaults.
 
 Current notes and limitations:
 
