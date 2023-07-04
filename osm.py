@@ -127,20 +127,6 @@ def remove_item(dest):
     else:
         dest.unlink()
 
-def remove_file(dest):
-    """Remove the given file."""
-    verbose("Removing backup file", dest)
-    if DRY_RUN:
-        return
-    dest.unlink()
-
-def remove_dir(dest):
-    """Remove the given directory."""
-    verbose("Removing backup directory", dest)
-    if DRY_RUN:
-        return
-    shutil.rmtree(str(dest), ignore_errors=True)
-
 def execute_command(command, vault_path):
     """Execute the given command in the given vault_path."""
     if DRY_RUN:
