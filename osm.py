@@ -45,10 +45,7 @@ VERBOSE = False
 DRY_RUN = False
 
 DIFF_CMD = ''
-'''
-When not '', it is set to the absolute path of the diff command to use
-and the copy commands used by `update` will do a diff instead.
-'''
+'''When not '', it is set to the absolute path of the diff command to use.'''
 
 def verbose(*args, **kwargs):
     '''Print parameters if VERBOSE flag is True or DRY_RUN is True.'''
@@ -223,6 +220,34 @@ def copy_settings(dest, src, clean_first):
     for item in ITEMS_TO_COPY:
         copy_settings_item(suffix, src, dest, item)
 
+def diff_settings(dest, src):
+    '''
+    Diff the settings between src and dest that would be updated if udpate were used.
+
+    Note that the diffs are done between dest and src to show src as "the new" stuff.
+    '''
+    src = Path(src)
+    dest = Path(dest)
+    # don't compre to self
+    if src.samefile(dest):
+        return
+
+    print(f"Diffing '{dest}' configuration to '{src}'")
+
+    src = src / '.obsidian'
+    dest = dest / '.obsidian'
+
+    for item in ITEMS_TO_COPY:
+        dest_item = dest / item
+        src_item = src / item
+        if not src_item.exists():
+            continue
+        diff_cmd = [DIFF_CMD, "-r", dest_item, src_item]
+        verbose(*diff_cmd)
+        if DRY_RUN:
+            continue
+        subprocess.run(diff_cmd)
+
 def backup_list_operation(vault_path, operation):
     '''Call operation with each backup item found in the given vault.'''
     dir_path = Path(vault_path) / '.obsidian'
@@ -264,8 +289,7 @@ def main():
             call_for_each_vault(vault_paths, copy_settings, Path.home() / args.update, args.rm)
         elif args.diff_to:
             ensure_valid_vault(vault_paths, args.diff_to)
-            # Note: By setting DIFF_CMD above, we can re-use the copy_settings helper.
-            call_for_each_vault(vault_paths, copy_settings, Path.home() / args.diff_to, False)
+            call_for_each_vault(vault_paths, diff_settings, Path.home() / args.diff_to)
         elif args.backup_list:
             call_for_each_vault(vault_paths, backup_list_operation, print)
         elif args.backup_remove:
