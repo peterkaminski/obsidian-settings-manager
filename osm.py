@@ -85,26 +85,6 @@ def copy_settings_item(suffix, src, dest, itemname):
     else:
         shutil.copy2(src_target, dest_target)
 
-# helper for `copy_settings()`
-# does nothing if `src` does not exist
-def copy_settings_file(datestring, src, dest, filename):
-    src_target = Path(src) / filename
-    dest_target = Path(dest) / filename
-    if src_target.exists():
-        if dest_target.exists():
-            dest_target.rename(str(dest_target)+datestring)
-        shutil.copy2(str(src_target), str(dest_target))
-
-# helper for `copy_settings()`
-# does nothing if `src` does not exist
-def copy_settings_dir(datestring, src, dest, dirname):
-    src_target = Path(src) / dirname
-    dest_target = Path(dest) / dirname
-    if src_target.exists():
-        if dest_target.exists():
-            dest_target.rename(str(dest_target)+datestring)
-        shutil.copytree(str(src_target), dest_target)
-
 # copy the usual settings files from `src` to `dest`
 # `dest` is backed up to same filename with a ISO 8601-style
 # date string ('2021-05-23T23:38:32.509386Z') in UTC appended,
@@ -129,19 +109,19 @@ def copy_settings(src, dest, args):
         dest.mkdir()
 
     # copy config
-    copy_settings_file(datestring, src, dest, 'config')
+    copy_settings_item(datestring, src, dest, 'config')
 
     # copy starred.json
-    copy_settings_file(datestring, src, dest, 'starred.json')
+    copy_settings_item(datestring, src, dest, 'starred.json')
 
     # copy file used for vaults distributed to others via git
-    copy_settings_file(datestring, src, dest, 'README.md')
+    copy_settings_item(datestring, src, dest, 'README.md')
 
     # copy plugins
-    copy_settings_dir(datestring, src, dest, 'plugins')
+    copy_settings_item(datestring, src, dest, 'plugins')
 
     # copy snippets
-    copy_settings_dir(datestring, src, dest, 'snippets')
+    copy_settings_item(datestring, src, dest, 'snippets')
 
 def backup_list_remove(vault_path, args):
     dir_path = Path(vault_path) / '.obsidian'
