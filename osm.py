@@ -32,6 +32,14 @@ ITEMS_TO_COPY = [
     'snippets',
 ]
 
+def datestring():
+    """Return the current date and time in UTC string format."""
+    return f'-{datetime.datetime.utcnow().isoformat()}Z'
+
+# Keep this in sync with the format returned by datestring()
+ISO_8601_GLOB = '*-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9]*Z'
+
+
 VERBOSE = False
 
 DRY_RUN = False
@@ -172,20 +180,19 @@ def copy_settings(src, dest, args):
     src = src / '.obsidian'
     dest = dest / '.obsidian'
 
-    # get current date/time
-    datestring = f"-{datetime.datetime.utcnow().isoformat()}Z"
+    # Use a timestamp for the suffix for uniqueness
+    suffix = datestring()
 
     # if --rm, remove and recreate .obsidian
     if args.rm:
         recreate_dir(dest)
 
     for item in ITEMS_TO_COPY:
-        copy_settings_item(datestring, src, dest, item)
+        copy_settings_item(suffix, src, dest, item)
 
 def backup_list_remove(vault_path, args):
     dir_path = Path(vault_path) / '.obsidian'
-    iso_8601_glob = '*-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9]*Z'
-    for dest in dir_path.glob(iso_8601_glob):
+    for dest in dir_path.glob(ISO_8601_GLOB):
         if args.backup_list:
             print(dest)
         elif args.backup_remove:
