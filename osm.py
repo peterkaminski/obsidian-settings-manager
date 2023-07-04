@@ -51,8 +51,8 @@ def verbose(*args, **kwargs):
     elif VERBOSE:
         print(*args, **kwargs)
 
-# set up argparse
 def init_argparse():
+    '''Return an initialized command line parser.'''
     parser = argparse.ArgumentParser(description='Manage Obsidian settings across multiple vaults.')
     parser.add_argument('--verbose', action='store_true', help='Print what the file system operations are happening')
     parser.add_argument('--dry-run', '-n', action='store_true', help='Do a dry-run. Show what would be done, without doing it.')
@@ -88,8 +88,12 @@ def user_vault_paths_from(obsidian, root_dir):
     return [vault_data['path'] for vault_data in obsidian['vaults'].values()
             if is_user_path(root_dir, vault_data['path'])]
 
-# find all the vaults Obsidian is tracking
 def get_vault_paths(root_dir):
+    '''
+    Return a list of all the vault paths Obsidian is trackig.
+
+    The list is string version of the absolute paths for the the vaults.
+    '''
     root_dir = Path(root_dir)
     obsidian = safe_load_config(root_dir / 'obsidian.json')
     return sorted(user_vault_paths_from(obsidian, root_dir), key=str.lower)
@@ -200,7 +204,6 @@ def copy_settings(dest, src, clean_first):
 
     print(f"Copying '{src}' configuration to '{dest}'")
 
-    # expand src and dest
     src = src / '.obsidian'
     dest = dest / '.obsidian'
 
@@ -220,10 +223,10 @@ def backup_list_operation(vault_path, operation):
         operation(dest)
 
 def show_vault_path(vault_path):
+    '''Print the vault path relative to the user's home directory (more readable).'''
     print(Path(vault_path).relative_to(Path.home()))
 
 def main():
-    # set up argparse
     argparser = init_argparse()
     args = argparser.parse_args()
 
@@ -235,11 +238,9 @@ def main():
         global DRY_RUN
         DRY_RUN = True
 
-    # do stuff
     try:
         vault_paths = get_vault_paths(args.root)
 
-        # decide what to do
         if args.version:
             print(f'{APPNAME} {VERSION}')
         elif args.list:
