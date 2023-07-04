@@ -1,5 +1,5 @@
 #!/usr/bin/env -S python -u
-# Witout -u, output from python is bufered and appears _after_ subprocess output.
+# Without -u, output from python is buffered and appears _after_ subprocess output.
 
 ################################################################
 #
