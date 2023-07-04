@@ -32,6 +32,13 @@ ITEMS_TO_COPY = [
     'snippets',
 ]
 
+VERBOSE = False
+
+def verbose(*args, **kwargs):
+    """Print parameters only if the global verbose flag is True."""
+    if VERBOSE:
+        print(*args, **kwargs)
+
 # set up argparse
 def init_argparse():
     # TODO: make "action" flags (list, update, execute, etc.) mutually exclusive
@@ -44,6 +51,7 @@ def init_argparse():
     parser.add_argument('--backup-remove', action='store_true', help='remove ISO 8601-formatted .obsidian backup files from all vaults')
     parser.add_argument('--root', default=OBSIDIAN_ROOT_DIR, help=f'Use an alternative Obsidian Root Directory (default {OBSIDIAN_ROOT_DIR!r})')
     parser.add_argument('--version', '-v', action='store_true', help='show version and exit')
+    parser.add_argument('--verbose', action='store_true', help='Print what the file system operations are happening')
     return parser
 
 def safe_load_config(config_file):
@@ -86,11 +94,16 @@ def copy_settings_item(suffix, src, dest, itemname):
     dest_target = Path(dest) / itemname
     if not src_target.exists():
         return
+    verbose()
     if dest_target.exists():
-        dest_target.rename(str(dest_target)+suffix)
+        backup = str(dest_target)+suffix
+        verbose("Saving current", dest_target, "as", backup)
+        dest_target.rename(backup)
     if src_target.is_dir():
+        verbose("Copying directory", src_target, "to", dest_target)
         shutil.copytree(src_target, dest_target)
     else:
+        verbose("Copying file", src_target, "to", dest_target)
         shutil.copy2(src_target, dest_target)
 
 # copy the usual settings files from `src` to `dest`
@@ -115,6 +128,7 @@ def copy_settings(src, dest, args):
 
     # if --rm, remove and recreate .obsidian
     if args.rm:
+        verbose("Removing and recreating", dest)
         shutil.rmtree(str(dest), ignore_errors=True)
         dest.mkdir()
 
@@ -129,14 +143,20 @@ def backup_list_remove(vault_path, args):
             print(dest)
         elif args.backup_remove:
             if dest.is_file():
+                verbose("Removing backup file", dest)
                 dest.unlink()
             elif dest.is_dir():
+                verbose("Removing backup directory", dest)
                 shutil.rmtree(str(dest), ignore_errors=True)
 
 def main():
     # set up argparse
     argparser = init_argparse();
     args = argparser.parse_args();
+
+    if args.verbose:
+        global VERBOSE
+        VERBOSE = True
 
     # do stuff
     try:
