@@ -202,6 +202,9 @@ def backup_list_operation(vault_path, operation):
     for dest in dir_path.glob(ISO_8601_GLOB):
         operation(dest)
 
+def show_vault_path(vault_path):
+    print(Path(vault_path).relative_to(Path.home()))
+
 def main():
     # set up argparse
     argparser = init_argparse();
@@ -223,8 +226,7 @@ def main():
         if args.version:
             print(f'{APPNAME} {VERSION}')
         elif args.list:
-            for vault_path in vault_paths:
-                print(Path(vault_path).relative_to(Path.home()))
+            call_for_each_vault(vault_paths, show_vault_path)
         elif args.update:
             # TODO: check if given UPDATE vault is really an Obsidian vault
             for vault_path in vault_paths:
