@@ -81,6 +81,38 @@ def get_vault_paths(root_dir):
     obsidian = safe_load_config(root_dir / 'obsidian.json')
     return sorted(user_vault_paths_from(obsidian, root_dir), key=str.lower)
 
+def backup(item, suffix):
+    """Rename item to have the given suffix."""
+    backup = str(item)+suffix
+    verbose("Saving current", item, "as", backup)
+    item.rename(backup)
+
+def copy_directory(src_target, dest_target):
+    """Copy the src_target directry to dest_target."""
+    verbose("Copying directory", src_target, "to", dest_target)
+    shutil.copytree(src_target, dest_target)
+
+def copy_file(src_target, dest_target):
+    """Copy the src_target file to dest_target."""
+    verbose("Copying file", src_target, "to", dest_target)
+    shutil.copy2(src_target, dest_target)
+
+def recreate_dir(dest):
+    """Delete and recreate the given directory."""
+    verbose("Removing and recreating", dest)
+    shutil.rmtree(dest, ignore_errors=True)
+    dest.mkdir()
+
+def remove_file(dest):
+    """Remove the given file."""
+    verbose("Removing backup file", dest)
+    dest.unlink()
+
+def remove_dir(dest):
+    """Remove the given directory."""
+    verbose("Removing backup directory", dest)
+    shutil.rmtree(str(dest), ignore_errors=True)
+
 def copy_settings_item(suffix, src, dest, itemname):
     """
     Copy itemname from src to dest.
@@ -96,15 +128,11 @@ def copy_settings_item(suffix, src, dest, itemname):
         return
     verbose()
     if dest_target.exists():
-        backup = str(dest_target)+suffix
-        verbose("Saving current", dest_target, "as", backup)
-        dest_target.rename(backup)
+        backup(dest_target, suffix)
     if src_target.is_dir():
-        verbose("Copying directory", src_target, "to", dest_target)
-        shutil.copytree(src_target, dest_target)
+        copy_directory(src_target, dest_target)
     else:
-        verbose("Copying file", src_target, "to", dest_target)
-        shutil.copy2(src_target, dest_target)
+        copy_file(src_target, dest_target)
 
 # copy the usual settings files from `src` to `dest`
 # `dest` is backed up to same filename with a ISO 8601-style
@@ -128,9 +156,7 @@ def copy_settings(src, dest, args):
 
     # if --rm, remove and recreate .obsidian
     if args.rm:
-        verbose("Removing and recreating", dest)
-        shutil.rmtree(str(dest), ignore_errors=True)
-        dest.mkdir()
+        recreate_dir(dest)
 
     for item in ITEMS_TO_COPY:
         copy_settings_item(datestring, src, dest, item)
@@ -143,11 +169,9 @@ def backup_list_remove(vault_path, args):
             print(dest)
         elif args.backup_remove:
             if dest.is_file():
-                verbose("Removing backup file", dest)
-                dest.unlink()
+                remove_file(dest)
             elif dest.is_dir():
-                verbose("Removing backup directory", dest)
-                shutil.rmtree(str(dest), ignore_errors=True)
+                remove_dir(dest)
 
 def main():
     # set up argparse
@@ -178,8 +202,7 @@ def main():
         elif args.execute:
             for vault_path in vault_paths:
                 print(f'\n# {vault_path}\n')
-                p = subprocess.Popen(args.execute, cwd=vault_path, shell=True)
-                p.wait()
+                subprocess.run(args.execute, cwd=vault_path, shell=True)
         else:
             argparser.print_help(sys.stderr)
 
