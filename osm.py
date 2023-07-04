@@ -243,8 +243,7 @@ def main():
             call_for_each_vault(vault_paths, show_vault_path)
         elif args.update:
             ensure_valid_vault(vault_paths, args.update)
-            for vault_path in vault_paths:
-                copy_settings(vault_path, Path.home() / args.update, args)
+            call_for_each_vault(copy_settings, Path.home() / args.update, args)
         elif args.backup_list:
             call_for_each_vault(vault_paths, backup_list_operation, print)
         elif args.backup_remove:
