@@ -38,7 +38,7 @@ def datestring():
     return f'-{datetime.datetime.utcnow().isoformat()}Z'
 
 # Keep this in sync with the format returned by datestring()
-ISO_8601_GLOB = '*-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9]*Z'
+ISO_8601_GLOB = '*-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'
 
 
 VERBOSE = False
