@@ -94,6 +94,11 @@ def get_vault_paths(root_dir):
     obsidian = safe_load_config(root_dir / 'obsidian.json')
     return sorted(user_vault_paths_from(obsidian, root_dir), key=str.lower)
 
+def call_for_each_vault(vault_paths, operation, *args):
+    """Call operation with each vault in vault_paths, followed by *args."""
+    for vault_path in vault_paths:
+        operation(vault_path, *args)
+
 def backup(item, suffix):
     """Rename item to have the given suffix."""
     backup = str(item)+suffix
@@ -227,11 +232,9 @@ def main():
             for vault_path in vault_paths:
                 copy_settings(Path.home() / args.update, vault_path, args)
         elif args.backup_list or args.backup_remove:
-            for vault_path in vault_paths:
-                backup_list_remove(vault_path, args)
+            call_for_each_vault(vault_paths, backup_list_remove, args)
         elif args.execute:
-            for vault_path in vault_paths:
-                execute_command(vault_path, args.execute)
+            call_for_each_vault(vault_paths, execute_command, args.execute)
         else:
             argparser.print_help(sys.stderr)
 
