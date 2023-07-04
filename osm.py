@@ -41,17 +41,17 @@ def verbose(*args, **kwargs):
 
 # set up argparse
 def init_argparse():
-    # TODO: make "action" flags (list, update, execute, etc.) mutually exclusive
     parser = argparse.ArgumentParser(description='Manage Obsidian settings across multiple vaults.')
-    parser.add_argument('--list', '-l', action='store_true', help='list Obsidian vaults')
-    parser.add_argument('--update', '-u', help='update Obsidian vaults from UPDATE vault')
-    parser.add_argument('--rm', action='store_true', help='with --update, remove .obsidian and create again, rather than retain old .obsidian files')
-    parser.add_argument('--execute', '-x', help='run EXECUTE command within each vault (use caution!)')
-    parser.add_argument('--backup-list', action='store_true', help='list ISO 8601-formatted .obsidian backup files from all vaults')
-    parser.add_argument('--backup-remove', action='store_true', help='remove ISO 8601-formatted .obsidian backup files from all vaults')
-    parser.add_argument('--root', default=OBSIDIAN_ROOT_DIR, help=f'Use an alternative Obsidian Root Directory (default {OBSIDIAN_ROOT_DIR!r})')
-    parser.add_argument('--version', '-v', action='store_true', help='show version and exit')
     parser.add_argument('--verbose', action='store_true', help='Print what the file system operations are happening')
+    parser.add_argument('--root', default=OBSIDIAN_ROOT_DIR, help=f'Use an alternative Obsidian Root Directory (default {OBSIDIAN_ROOT_DIR!r})')
+    parser.add_argument('--rm', action='store_true', help='with --update, remove .obsidian and create again, rather than retain old .obsidian files')
+    only_one_of = parser.add_mutually_exclusive_group(required=True)
+    only_one_of.add_argument('--list', '-l', action='store_true', help='list Obsidian vaults')
+    only_one_of.add_argument('--update', '-u', help='update Obsidian vaults from UPDATE vault')
+    only_one_of.add_argument('--execute', '-x', help='run EXECUTE command within each vault (use caution!)')
+    only_one_of.add_argument('--backup-list', action='store_true', help='list ISO 8601-formatted .obsidian backup files from all vaults')
+    only_one_of.add_argument('--backup-remove', action='store_true', help='remove ISO 8601-formatted .obsidian backup files from all vaults')
+    only_one_of.add_argument('--version', '-v', action='store_true', help='show version and exit')
     return parser
 
 def safe_load_config(config_file):
