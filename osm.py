@@ -94,6 +94,20 @@ def get_vault_paths(root_dir):
     obsidian = safe_load_config(root_dir / 'obsidian.json')
     return sorted(user_vault_paths_from(obsidian, root_dir), key=str.lower)
 
+# It might be cleaner to have this defined after the functions it calls,
+# but keeping it close to get_vault_paths to make it easier to track changes if needed.
+def ensure_valid_vault(vault_paths, vault_to_check):
+    """
+    Ensure that vault_to_check (relative path) is in the list of (absolute path) vault_paths.
+
+    Only returns if it is, otherwise, print an error and exit.
+    """
+    if str(Path.home() / vault_to_check) in vault_paths:
+        return
+    print(f"Error: {vault_to_check!r} is not one of your vaults:")
+    call_for_each_vault(vault_paths, show_vault_path)
+    exit(-1)
+
 def call_for_each_vault(vault_paths, operation, *args):
     """Call operation with each vault in vault_paths, followed by *args."""
     for vault_path in vault_paths:
@@ -228,7 +242,7 @@ def main():
         elif args.list:
             call_for_each_vault(vault_paths, show_vault_path)
         elif args.update:
-            # TODO: check if given UPDATE vault is really an Obsidian vault
+            ensure_valid_vault(vault_paths, args.update)
             for vault_path in vault_paths:
                 copy_settings(Path.home() / args.update, vault_path, args)
         elif args.backup_list:
