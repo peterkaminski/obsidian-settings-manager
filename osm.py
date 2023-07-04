@@ -221,6 +221,17 @@ def copy_settings(dest, src, clean_first):
     for item in ITEMS_TO_COPY:
         copy_settings_item(suffix, src, dest, item)
 
+def do_diff(old, new):
+    '''Diff two items, prefix with the diff command used.'''
+    diff_cmd = [DIFF_CMD]
+    if old.is_dir():
+        diff_cmd.append('-r')
+    diff_cmd += [old, new]
+    print(*diff_cmd)
+    if DRY_RUN:
+        return
+    subprocess.run(diff_cmd)
+
 def diff_settings(dest, src):
     '''
     Diff the settings between src and dest that would be updated if udpate were used.
@@ -241,13 +252,8 @@ def diff_settings(dest, src):
     for item in ITEMS_TO_COPY:
         dest_item = dest / item
         src_item = src / item
-        if not src_item.exists():
-            continue
-        diff_cmd = [DIFF_CMD, "-r", dest_item, src_item]
-        verbose(*diff_cmd)
-        if DRY_RUN:
-            continue
-        subprocess.run(diff_cmd)
+        if src_item.exists() and dest_item.exists():
+            do_diff(dest_item, src_item)
 
 def backup_list_operation(vault_path, operation):
     '''Call operation with each backup item found in the given vault.'''
