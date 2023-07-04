@@ -95,7 +95,7 @@ def user_vault_paths_from(obsidian, root_dir):
 
 def get_vault_paths(root_dir):
     '''
-    Return a list of all the vault paths Obsidian is trackig.
+    Return a list of all the vault paths Obsidian is tracking.
 
     The list is string version of the absolute paths for the the vaults.
     '''
