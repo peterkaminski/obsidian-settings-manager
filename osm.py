@@ -4,7 +4,7 @@
 ################################################################
 #
 # osm.py - Obsidian Settings Manager
-# Copyright 2021 Peter Kaminski. Licensed under MIT License.
+# Copyright 2021-2023 Peter Kaminski. Licensed under MIT License.
 # https://github.com/peterkaminski/obsidian-settings-manager
 #
 ################################################################

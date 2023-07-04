@@ -75,6 +75,22 @@ To list Obsidian vaults, use `-l` or `--list`:
 ./osm.py --list
 ```
 
+### Dry Run
+
+For any command, show what would be done, without doing it. Add `-n` or `--dry-run` (in this example, to the `--backup-remove` command):
+
+```shell
+./osm.py -n --backup-remove
+```
+
+### Set Obsidian Root Directory
+
+You may need to tell OSM where the Obisidan Root Directory is, rather than use the default. Use the `--root` argument:
+
+```shell
+./osm.py --root [other commands]
+```
+
 ### Update Vault Configuration
 
 To copy this files and directories from one Obsidian's `.obsidian` directory to all the other vaults, use `-u` or `--update`, with the directory name of the source vault after the flag:
@@ -96,6 +112,16 @@ The files and directories currently copied (as long as they exist in the source 
 - `plugins` - source code and settings for community plugins
 - `snippets` - CSS snippets for customizing Obsidian's appearance
 - `README.md` - optional file used for vaults distributed to others via Git
+
+See the `ITEMS_TO_COPY` global in the code to configure this.
+
+### Diff-To
+
+Like update but instead of copying, just show a diff against DIFF_TO instead. No changes are made. Use `-d` or `--diff-to`, with the directory name of the source vault after the flag:
+
+```shell
+./osm.py --diff-to Vaults/obsidian-settings
+```
 
 ### Execute Command
 
@@ -142,13 +168,13 @@ Bug reports, enhancement suggestions, and pull requests are welcome at the [Obsi
 Here are some possible enhancements already contemplated.
 
 - List details of vault plugins, snippets, config.
-- More fine-grained control over which files and directories are copied, and which destination vaults they are copied to.
+- More fine-grained control over which files and directories are copied, and which destination vaults they are copied to. This would replace the `ITEMS_TO_COPY` global.
   - Use `--input` / `-i` to specify a file that contains vault paths, instead of reading the vault paths from Obsidian.
   - Use `--config` / `-c` to specify a YAML file which specifies which files and directories to copy.
 - Option to merge config files, rather than replace.
 - Back up vaults to another location.
 - Back up vault configuration to another location.
-- Output commands to run on the OS's CLI, rather than actually executing actions.
+- Output commands to run on the OS's CLI, rather than actually executing or dry-running actions.
 
 ## Contributors
 
@@ -159,7 +185,7 @@ Obsidian Settings Manager is open source. Pull requests and suggestions are grat
 
 ## MIT License
 
-Copyright (c) 2021 Peter Kaminski
+Copyright (c) 2021-2023 Peter Kaminski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
