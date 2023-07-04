@@ -116,6 +116,17 @@ def recreate_dir(dest):
     shutil.rmtree(dest, ignore_errors=True)
     dest.mkdir()
 
+def remove_item(dest):
+    """Remove the given item (file or directory)."""
+    is_dir = dest.is_dir()
+    verbose("Removing backup", "directory" if is_dir else "file", dest)
+    if DRY_RUN:
+        return
+    if is_dir:
+        shutil.rmtree(dest, ignore_errors=True)
+    else:
+        dest.unlink()
+
 def remove_file(dest):
     """Remove the given file."""
     verbose("Removing backup file", dest)
@@ -192,10 +203,7 @@ def backup_list_remove(vault_path, args):
         if args.backup_list:
             print(dest)
         elif args.backup_remove:
-            if dest.is_file():
-                remove_file(dest)
-            elif dest.is_dir():
-                remove_dir(dest)
+            remove_item(dest)
 
 def main():
     # set up argparse
