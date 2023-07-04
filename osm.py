@@ -90,15 +90,17 @@ def copy_settings_item(suffix, src, dest, itemname):
 # date string ('2021-05-23T23:38:32.509386Z') in UTC appended,
 # unless `--rm` is given
 def copy_settings(src, dest, args):
+    src = Path(src)
+    dest = Path(dest)
     # don't operate on self
-    if str(src) == str(dest):
+    if src.samefile(dest):
         return
 
     print(f"Copying '{src}' configuration to '{dest}'")
 
     # expand src and dest
-    src = Path(src) / '.obsidian'
-    dest = Path(dest) / '.obsidian'
+    src = src / '.obsidian'
+    dest = dest / '.obsidian'
 
     # get current date/time
     datestring = f"-{datetime.datetime.utcnow().isoformat()}Z"
