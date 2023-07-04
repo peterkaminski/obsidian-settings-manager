@@ -135,8 +135,9 @@ def remove_item(dest):
     else:
         dest.unlink()
 
-def execute_command(command, vault_path):
+def execute_command(vault_path, command):
     """Execute the given command in the given vault_path."""
+    print(f'\n# {vault_path}\n')
     if DRY_RUN:
         verbose("Would run command:", repr(command))
     else:
@@ -230,8 +231,7 @@ def main():
                 backup_list_remove(vault_path, args)
         elif args.execute:
             for vault_path in vault_paths:
-                print(f'\n# {vault_path}\n')
-                execute_command(args.execute, vault_path)
+                execute_command(vault_path, args.execute)
         else:
             argparser.print_help(sys.stderr)
 
