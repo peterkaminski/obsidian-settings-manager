@@ -174,6 +174,8 @@ Here are some possible enhancements already contemplated.
 - Option to merge config files, rather than replace.
 - Back up vaults to another location.
 - Back up vault configuration to another location.
+- `--backup-create` - just back up files without doing `--update`
+- `--backup-restore ISO_8601_DATE` - restore from backup files
 - Output commands to run on the OS's CLI, rather than actually executing or dry-running actions.
 
 ## Contributors
