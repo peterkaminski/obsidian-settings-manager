@@ -24,6 +24,14 @@ from pathlib import Path
 DEFAULT_OBSIDIAN_ROOT = str(Path.home() / 'Library' / 'Application Support' / 'obsidian')
 OBSIDIAN_ROOT_DIR = os.getenv("OBSIDIAN_ROOT", DEFAULT_OBSIDIAN_ROOT)
 
+ITEMS_TO_COPY = [
+    'config',
+    'starred.json',
+    'README.md', # used for vaults distributed to others via git
+    'plugins',
+    'snippets',
+]
+
 # set up argparse
 def init_argparse():
     # TODO: make "action" flags (list, update, execute, etc.) mutually exclusive
@@ -110,20 +118,8 @@ def copy_settings(src, dest, args):
         shutil.rmtree(str(dest), ignore_errors=True)
         dest.mkdir()
 
-    # copy config
-    copy_settings_item(datestring, src, dest, 'config')
-
-    # copy starred.json
-    copy_settings_item(datestring, src, dest, 'starred.json')
-
-    # copy file used for vaults distributed to others via git
-    copy_settings_item(datestring, src, dest, 'README.md')
-
-    # copy plugins
-    copy_settings_item(datestring, src, dest, 'plugins')
-
-    # copy snippets
-    copy_settings_item(datestring, src, dest, 'snippets')
+    for item in ITEMS_TO_COPY:
+        copy_settings_item(datestring, src, dest, item)
 
 def backup_list_remove(vault_path, args):
     dir_path = Path(vault_path) / '.obsidian'
