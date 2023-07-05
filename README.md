@@ -16,12 +16,11 @@ In the current incarnation, it can:
 
 - List the vaults Obsidian knows about.
 - Copy the settings, plugins, and snippets from one vault to all the other vaults.
-  - By default, backups are made, but a flag can be used to reset the configuration and make the destination vault's configs an exact copy.
+  - By default, backups are made, but a flag can be used to reset the configuration and make the destination vaults' configs an exact copy.
 - Dry-run option to see what commands would do, without doing it.
 - Show a diff of what would change if a copy were done.
 - Execute a command within each vault.
-- List or remove backup files from the `.obsidian` directory of all vaults.
-  (These backup files are created by the default Copy operation.)
+- List or remove backup files (created by the copy operation) from the `.obsidian` directory of all vaults.
 
 Current notes and limitations:
 
@@ -107,10 +106,9 @@ so that you don't have to remember to use the `--root` option all the time.
 export OBSIDIAN_ROOT=/my/obsidian/root/directory
 ```
 
-You can add that to your shell's initialization file for convenience.
-Depending on your shell that could be: `~/.zshrc` or `~/.bashrc`. Consult your shell documentation for details.
+For convenience, you can add the `export` command to your shell's initialization file (for example, `~/.zshrc` or `~/.bashrc`). Consult your shell documentation for more information about its initialization file.
 
-If the `--root` option is used on the command line, its value is used; otherwise the environment variable is used; and if neither is not set, the built-in OSM default is used.
+If the `--root` option is used on the command line, its value is used; otherwise the environment variable is used; and if neither is set, the built-in OSM default is used.
 
 
 ### Update Vault Configuration
