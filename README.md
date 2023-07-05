@@ -94,6 +94,12 @@ You may need to tell OSM where the Obisidan Root Directory is, rather than use t
 ./osm.py --root /my/obsidian/root/directory [other commands]
 ```
 
+Typical locations:
+
+- Mac, `/Users/<username>/Library/Application Support/obsidian`
+- Linux, `/home/<username>/.config/obsidian`
+- Windows, `C:\Users\<username>\AppData\obsidian`
+
 If you need to use this often, you can also set the environment variable `OBSIDIAN_ROOT`,
 so that you don't have to remember to use the `--root` option all the time.
 
@@ -102,9 +108,9 @@ export OBSIDIAN_ROOT=/my/obsidian/root/directory
 ```
 
 You can add that to your shell's initialization file for convenience.
-Depending on your shell that could be: `~/.zshrc` or `~/.bashrc` (Consult your shell documentation for details.)
+Depending on your shell that could be: `~/.zshrc` or `~/.bashrc`. Consult your shell documentation for details.
 
-If the `--root` option is used on the command line, it's value is used, otherwise the environment variable is used, and if it is not set, the `osm` built in default is used.
+If the `--root` option is used on the command line, its value is used; otherwise the environment variable is used; and if neither is not set, the built-in OSM default is used.
 
 
 ### Update Vault Configuration
