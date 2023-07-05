@@ -22,8 +22,8 @@ import sys
 import traceback
 from pathlib import Path
 
-DEFAULT_OBSIDIAN_ROOT = str(Path.home() / 'Library' / 'Application Support' / 'obsidian')
-OBSIDIAN_ROOT_DIR = os.getenv('OBSIDIAN_ROOT', DEFAULT_OBSIDIAN_ROOT)
+DEFAULT_ROOT_CONFIG_FILE = "README.md"
+OBSIDIAN_ROOT_DIR = os.getenv('OBSIDIAN_ROOT', '')
 
 ITEMS_TO_COPY = [
     'config',
@@ -47,6 +47,45 @@ DRY_RUN = False
 
 DIFF_CMD = ''
 '''When not '', it is set to the absolute path of the diff command to use.'''
+
+def find_obsidian_default_root():
+    """Scan the the Default Root Config file for the Obsidian Root default locations, pick the first that exists, if any."""
+    global OBSIDIAN_ROOT_DIR
+
+    if OBSIDIAN_ROOT_DIR:
+        return  # Has already been overridden with an environment variable, no need to check.
+
+    try:
+        readme_contents = Path(DEFAULT_ROOT_CONFIG_FILE).read_text()
+    except Exception:
+        return  # Don't complain, this is just a proof of concept.
+
+    username = os.getlogin()
+    found_section = False
+
+    # THIS IS SUPER HACKY, proof of concept.
+    # If we like the idea of finding the location from the README,
+    # a) Improve this code
+    # b) reformat that part of the README for even easier parsing.
+
+    for line in readme_contents.splitlines():
+        if "default locations:" in line.lower():
+            found_section = True
+            continue
+        if not found_section:
+            continue
+        if not line:
+            continue  # Allow blank lines before, or in the middle of, the list of locations.
+        if not line.startswith("-"):
+            return  # We hit the end of the list without finding anything, give up.
+        candidate = line.split('`')
+        if len(candidate) != 3: # Pre-amble, one item, postamble
+            return  # We ran out of candidates to try, give up.
+        potential_dir = candidate[1].replace("<username>", username)
+        if Path(potential_dir).is_dir():
+            OBSIDIAN_ROOT_DIR = potential_dir
+            return
+
 
 def verbose(*args, **kwargs):
     '''Print parameters if VERBOSE flag is True or DRY_RUN is True.'''
@@ -273,6 +312,7 @@ def show_vault_path(vault_path):
     print(Path(vault_path).relative_to(Path.home()))
 
 def main():
+    find_obsidian_default_root()
     argparser = init_argparse()
     args = argparser.parse_args()
 
