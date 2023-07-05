@@ -101,7 +101,8 @@ so that you don't have to remember to use the `--root` option all the time.
 export OBSIDIAN_ROOT=/my/obsidian/root/directory
 ```
 
-You can add that to your shell's initialization file: `.zshrc` or `.bashrc` or for convenience.
+You can add that to your shell's initialization file for convenience.
+Depending on your shell that could be: `~/.zshrc` or `~/.bashrc` (Consult your shell documentation for details.)
 
 If the `--root` option is used on the command line, it's value is used, otherwise the environment variable is used, and if it is not set, the `osm` built in default is used.
 
