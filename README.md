@@ -103,6 +103,8 @@ export OBSIDIAN_ROOT=/my/obsidian/root/directory
 
 You can add that to your shell's initialization file: `.zshrc` or `.bashrc` or for convenience.
 
+If the `--root` option is used on the command line, it's value is used, otherwise the environment variable is used, and if it is not set, the `osm` built in default is used.
+
 
 ### Update Vault Configuration
 
