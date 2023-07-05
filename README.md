@@ -16,16 +16,18 @@ In the current incarnation, it can:
 
 - List the vaults Obsidian knows about.
 - Copy the settings, plugins, and snippets from one vault to all the other vaults.
+  - By default, backups are made, but a flag can be used to reset the configuration and make the destination vaults' configs an exact copy.
 - Dry-run option to see what commands would do, without doing it.
 - Show a diff of what would change if a copy were done.
 - Execute a command within each vault.
-- List or remove backup files from the `.obsidian` directory of all vaults.
+- List or remove backup files (created by the copy operation) from the `.obsidian` directory of all vaults.
 
 Current notes and limitations:
 
 - Early release, no significant testing yet.
 - No options for specifying particular destination directories to copy to or to ignore.  In future versions, there may be more options providing more fine-grained control.
 - No options for changing which files and directories are copied and which are ignored.  In future versions, there may be more options providing more fine-grained control.
+- No option for selecting just a subset of your vaults to be affected by the Copy operation.
 - Mac and Linux only (although Windows might not be too hard).
 - Command-line only.
 - Python 3 (tested with Python 3.8).
@@ -88,8 +90,26 @@ For any command, show what would be done, without doing it. Add `-n` or `--dry-r
 You may need to tell OSM where the Obisidan Root Directory is, rather than use the default. Use the `--root` argument:
 
 ```shell
-./osm.py --root [other commands]
+./osm.py --root /my/obsidian/root/directory [other commands]
 ```
+
+Typical locations:
+
+- Mac, `/Users/<username>/Library/Application Support/obsidian`
+- Linux, `/home/<username>/.config/obsidian`
+- Windows, `C:\Users\<username>\AppData\obsidian`
+
+If you need to use this often, you can also set the environment variable `OBSIDIAN_ROOT`,
+so that you don't have to remember to use the `--root` option all the time.
+
+```shell
+export OBSIDIAN_ROOT=/my/obsidian/root/directory
+```
+
+For convenience, you can add the `export` command to your shell's initialization file (for example, `~/.zshrc` or `~/.bashrc`). Consult your shell documentation for more information about its initialization file.
+
+If the `--root` option is used on the command line, its value is used; otherwise the environment variable is used; and if neither is set, the built-in OSM default is used.
+
 
 ### Update Vault Configuration
 
