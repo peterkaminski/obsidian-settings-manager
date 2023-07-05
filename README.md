@@ -163,6 +163,7 @@ The default locations for the Obsidian configuration directory:
 
 - Mac, `/Users/<username>/Library/Application Support/obsidian`
 - Linux, `/home/<username>/.config/obsidian`
+- Linux, `/home/<username>/.var/app/md.obsidian.Obsidian/config/obsidian` (alternate installation location)
 - Windows, `C:\Users\<username>\AppData\obsidian`
 
 If the `--list` option doesn't show your vaults or if you want OSM to use an alternate Obsidian configuration, use the `--root` option:
