@@ -155,21 +155,23 @@ To remove all of these files, use `--backup-remove`:
 
 There is no undo for this operation. Consider using `--backup-list` before `--backup-remove` to double check that the files found are okay to remove.
 
-### Set Obsidian Root Directory
+### Where Are My Vaults?
 
-You may need to tell OSM where the Obisidan Root Directory is, rather than use the default. Use the `--root` argument:
+Normally OSM will find your vaults automatically by looking in the default Obsidian configuration directory.
 
-```shell
-./osm.py --root /my/obsidian/root/directory [other commands]
-```
-
-Typical locations:
+Default locations:
 
 - Mac, `/Users/<username>/Library/Application Support/obsidian`
 - Linux, `/home/<username>/.config/obsidian`
 - Windows, `C:\Users\<username>\AppData\obsidian`
 
-If you need to use this often, you can also set the environment variable `OBSIDIAN_ROOT`,
+If the `--list` option doesn't show your vaults, or you have a custom set up, or otherwise want OSM to use an alternate Obsidian configuration, you can to use the `--root` option.
+
+```shell
+./osm.py --root /my/obsidian/root/directory [other commands]
+```
+
+If you need to use this often, you can set the environment variable `OBSIDIAN_ROOT`,
 so that you don't have to remember to use the `--root` option all the time.
 
 ```shell
