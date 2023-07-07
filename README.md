@@ -159,11 +159,10 @@ There is no undo for this operation. Consider using `--backup-list` before `--ba
 
 Normally OSM will find your vaults automatically by looking in the default Obsidian configuration directory for a file called `obsidian.json`, which is used by Obsidian to store the list of all the vaults it knows about.
 
-The default locations for the Obsidian configuration directory:
-
-- Mac, `/Users/<username>/Library/Application Support/obsidian`
-- Linux, `/home/<username>/.config/obsidian`
-- Windows, `C:\Users\<username>\AppData\obsidian`
+The default locations to scan for the Obsidian configuration directory are stored in the simple text file: [obsidian_config_dirs.txt](obsidian_config_dirs.txt)
+The format is simple, blank lines are ignored, and the '#' starts a line that is a comment.
+Within each line, all occurrances of `<username>` are replaced with your login name.
+Feel free to edit this file, but be aware that any changes will be lost when you upgrade to a newer version of OSM.
 
 If the `--list` option doesn't show your vaults or if you want OSM to use an alternate Obsidian configuration, use the `--root` option:
 
