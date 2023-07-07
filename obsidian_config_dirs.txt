@@ -1,15 +1,14 @@
-# Mac:
+# Obsidian's configuration directory list.
+# See the README.md for details.
 
+# Mac:
 /Users/<username>/Library/Application Support/obsidian
 
 # Linux:
-
 /home/<username>/.config/obsidian
 
 # Linux alternative install:
-
 /home/<username>/.var/app/md.obsidian.Obsidian/config/obsidian
 
 # Windows:
-
 C:\Users\<username>\AppData\obsidian
