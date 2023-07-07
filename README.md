@@ -182,7 +182,6 @@ For convenience, you can add the `export` command to your shell's initialization
 
 If the `--root` option is used on the command line, its value is used; otherwise the environment variable is used; and if neither is set, the built-in OSM default is used.
 
-
 ## Possible Enhancements
 
 Bug reports, enhancement suggestions, and pull requests are welcome at the [Obsidian Settings Manager repo](https://github.com/peterkaminski/obsidian-settings-manager).
