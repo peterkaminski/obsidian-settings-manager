@@ -157,22 +157,22 @@ There is no undo for this operation. Consider using `--backup-list` before `--ba
 
 ### Where Are My Vaults?
 
-Normally OSM will find your vaults automatically by looking in the default Obsidian configuration directory.
+Normally OSM will find your vaults automatically by looking in the default Obsidian configuration directory for a file called `obsidian.json`, which is used by Obsidian to store the list of all the vaults it knows about.
 
-Default locations:
+The default locations for the Obsidian configuration directory:
 
 - Mac, `/Users/<username>/Library/Application Support/obsidian`
 - Linux, `/home/<username>/.config/obsidian`
 - Windows, `C:\Users\<username>\AppData\obsidian`
 
-If the `--list` option doesn't show your vaults, or you have a custom set up, or otherwise want OSM to use an alternate Obsidian configuration, you can to use the `--root` option.
+If the `--list` option doesn't show your vaults or if you want OSM to use an alternate Obsidian configuration, use the `--root` option:
 
 ```shell
-./osm.py --root /my/obsidian/root/directory [other commands]
+./osm.py --root /my/obsidian/root/directory [other commands as needed]
 ```
 
 If you need to use this often, you can set the environment variable `OBSIDIAN_ROOT`,
-so that you don't have to remember to use the `--root` option all the time.
+so that you don't have to remember to use the `--root` option all the time:
 
 ```shell
 export OBSIDIAN_ROOT=/my/obsidian/root/directory
