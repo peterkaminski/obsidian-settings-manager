@@ -85,32 +85,6 @@ For any command, show what would be done, without doing it. Add `-n` or `--dry-r
 ./osm.py -n --backup-remove
 ```
 
-### Set Obsidian Root Directory
-
-You may need to tell OSM where the Obisidan Root Directory is, rather than use the default. Use the `--root` argument:
-
-```shell
-./osm.py --root /my/obsidian/root/directory [other commands]
-```
-
-Typical locations:
-
-- Mac, `/Users/<username>/Library/Application Support/obsidian`
-- Linux, `/home/<username>/.config/obsidian`
-- Windows, `C:\Users\<username>\AppData\obsidian`
-
-If you need to use this often, you can also set the environment variable `OBSIDIAN_ROOT`,
-so that you don't have to remember to use the `--root` option all the time.
-
-```shell
-export OBSIDIAN_ROOT=/my/obsidian/root/directory
-```
-
-For convenience, you can add the `export` command to your shell's initialization file (for example, `~/.zshrc` or `~/.bashrc`). Consult your shell documentation for more information about its initialization file.
-
-If the `--root` option is used on the command line, its value is used; otherwise the environment variable is used; and if neither is set, the built-in OSM default is used.
-
-
 ### Update Vault Configuration
 
 To copy this files and directories from one Obsidian's `.obsidian` directory to all the other vaults, use `-u` or `--update`, with the directory name of the source vault after the flag:
@@ -180,6 +154,33 @@ To remove all of these files, use `--backup-remove`:
 ```
 
 There is no undo for this operation. Consider using `--backup-list` before `--backup-remove` to double check that the files found are okay to remove.
+
+### Where Are My Vaults?
+
+Normally OSM will find your vaults automatically by looking in the default Obsidian configuration directory for a file called `obsidian.json`, which is used by Obsidian to store the list of all the vaults it knows about.
+
+The default locations for the Obsidian configuration directory:
+
+- Mac, `/Users/<username>/Library/Application Support/obsidian`
+- Linux, `/home/<username>/.config/obsidian`
+- Windows, `C:\Users\<username>\AppData\obsidian`
+
+If the `--list` option doesn't show your vaults or if you want OSM to use an alternate Obsidian configuration, use the `--root` option:
+
+```shell
+./osm.py --root /my/obsidian/root/directory [other commands as needed]
+```
+
+If you need to use this often, you can set the environment variable `OBSIDIAN_ROOT`,
+so that you don't have to remember to use the `--root` option all the time:
+
+```shell
+export OBSIDIAN_ROOT=/my/obsidian/root/directory
+```
+
+For convenience, you can add the `export` command to your shell's initialization file (for example, `~/.zshrc` or `~/.bashrc`). Consult your shell documentation for more information about its initialization file.
+
+If the `--root` option is used on the command line, its value is used; otherwise the environment variable is used; and if neither is set, the built-in OSM default is used.
 
 ## Possible Enhancements
 
