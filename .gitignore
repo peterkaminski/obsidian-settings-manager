@@ -5,5 +5,8 @@
 *~
 \#*\#
 
+# vim
+.*.swp
+
 # Python
 venv
