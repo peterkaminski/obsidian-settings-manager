@@ -61,8 +61,8 @@ from pathlib import Path
 # Globals
 ###
 
-OSM_CONFIG_FILE = "osm.config"
-OSM_CONFIG_ENV_VAR_OVERRIDE = "OSM_CONFIG_FILE"
+OSM_CONFIG_FILE = 'osm.config'
+OSM_CONFIG_ENV_VAR_OVERRIDE = 'OSM_CONFIG_FILE'
 OSM_CONFIG = {}  # Will be replaced (using .update()) by the config data we end up loading.
 OSM_DEFAULT_CONFIG = r'''
 {
@@ -102,8 +102,10 @@ def datestring():
 ISO_8601_GLOB = '*-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'
 
 VERBOSE = False
-
 DRY_RUN = False
+
+# Various 'what went wrong' controls a user can use to see why OSM isn't doing what they expected.
+CONFIG_TRACE = os.getenv('CONFIG_TRACE', False)
 
 DIFF_CMD = ''
 '''When not '', it is set to the absolute path of the diff command to use.'''
@@ -111,6 +113,11 @@ DIFF_CMD = ''
 ###
 # Generic Utility Functions
 ###
+
+def config_trace(*args, **kwargs):
+    '''Print parameters if CONFIG_TRACE flag is True.'''
+    if CONFIG_TRACE:
+        print(*args, **kwargs)
 
 def verbose(*args, **kwargs):
     '''Print parameters if VERBOSE flag is True or DRY_RUN is True.'''
@@ -146,7 +153,7 @@ def init_argparse():
     parser = argparse.ArgumentParser(description='Manage Obsidian settings across multiple vaults.')
     parser.add_argument('--verbose', action='store_true', help='Print what the file system operations are happening')
     parser.add_argument('--dry-run', '-n', action='store_true', help='Do a dry-run. Show what would be done, without doing it.')
-    parser.add_argument('--root', default=OBSIDIAN_ROOT_DIR, help=f'Use an alternative Obsidian Root Directory (default {OBSIDIAN_ROOT_DIR!r})')
+    parser.add_argument('--config', '-c', help="Use CONFIG as the OSM config file instead of the default")
     only_one_of = parser.add_mutually_exclusive_group(required=True)
     only_one_of.add_argument('--list', '-l', action='store_true', help='list Obsidian vaults')
     only_one_of.add_argument('--update', '-u', help='update Obsidian vaults from UPDATE vault')
@@ -163,24 +170,33 @@ def init_argparse():
 ###
 
 def find_osm_config_file():
-    '''No configuration file was given, so let's go looking and return the first one in our priority list!'''
+    '''Return the first OSM config file we find from our priority list, or None.'''
     env_var_value = os.getenv(OSM_CONFIG_ENV_VAR_OVERRIDE)
+    config_trace(f'OSM Config checking environment variable: {env_var_value!r}')
     if env_var_value:
         return Path(env_var_value)
+
     local_config = Path(OSM_CONFIG_FILE)
+    config_trace(f'OSM Config checking local directory: {local_config}')
     if local_config.is_file():
         return local_config
+
     home_config = Path.home() / OSM_CONFIG_FILE
+    config_trace(f'OSM Config checking home directory: {home_config}')
     if home_config.is_file():
         return home_config
+
+    config_trace(f'OSM Config not found')
     return None
 
 def load_osm_config(config_file=None):
     '''Load our OSM configuration from the config_file if given, or from our hierarchy of places to look.'''
     config_file = config_file or find_osm_config_file()
     if config_file:
+        config_trace(f'Loading OSM configuration from: {config_file}')
         OSM_CONFIG.update(safe_load_json(safe_read_contents(config_file), f'Config file: {config_file}'))
     else:
+        config_trace('Loading OSM configuration from internal default configuration')
         OSM_CONFIG.update(safe_load_json(OSM_DEFAULT_CONFIG, 'Built-in configuration data'))
 
 ###
@@ -400,6 +416,8 @@ def main():
         if not DIFF_CMD:
             print("Error: Cannot locate the 'diff' command, aborting.")
             exit(-1)
+
+    load_osm_config()
 
     try:
         vault_paths = get_vault_paths(args.root)
