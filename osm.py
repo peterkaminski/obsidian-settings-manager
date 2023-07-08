@@ -72,13 +72,21 @@ def init_argparse():
     only_one_of.add_argument('--version', '-v', action='store_true', help='show version and exit')
     return parser
 
-def safe_load_config(config_file):
-    '''Return the parsed JSON from config_file, or exit with an error message if open/parse fails.'''
+def safe_read_contents(from_file):
+    '''Return the contents of from_file, or exit with an error message if open/read fails.'''
     try:
-        with open(config_file) as infile:
-            return json.load(infile)
+        return Path(from_file).read_text()
     except Exception as e:
-        print('Unable to load Obsidian config file:', config_file)
+        print('Unable to read file:', from_file)
+        print(e)
+        exit(-1)
+
+def safe_load_json(from_contents, source):
+    '''Return the parsed JSON from_contents, or exit with an error message if the parse fails.'''
+    try:
+        return json.loads(from_contents)
+    except Exception as e:
+        print('Unable to parse json from', source)
         print(e)
         exit(-1)
 
@@ -100,7 +108,8 @@ def get_vault_paths(root_dir):
     The list is string version of the absolute paths for the the vaults.
     '''
     root_dir = Path(root_dir)
-    obsidian = safe_load_config(root_dir / 'obsidian.json')
+    obsidian_config = root_dir / 'obsidian.json'
+    obsidian = safe_load_json(safe_read_contents(obsidian_config), f'Obsidian config file: {obsidian_config}')
     return sorted(user_vault_paths_from(obsidian, root_dir), key=str.lower)
 
 # It might be cleaner to have this defined after the functions it calls,
