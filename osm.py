@@ -66,9 +66,9 @@ def lines_from(file_contents):
     """Yield strip()'d lines from file_contents that aren't blank or comments."""
 
     for line in file_contents.splitlines():
+        line = line.strip()  # Allow indentation, esp. for comments.
         if not line:
             continue  # Ignore blank lines
-        line = line.strip()  # Allow indentation, esp. for comments.
         if line.startswith(CONFIG_COMMENT_MARKER):
             continue
         yield line
