@@ -61,10 +61,10 @@ def init_argparse():
     parser.add_argument('--verbose', action='store_true', help='Print what the file system operations are happening')
     parser.add_argument('--dry-run', '-n', action='store_true', help='Do a dry-run. Show what would be done, without doing it.')
     parser.add_argument('--root', default=OBSIDIAN_ROOT_DIR, help=f'Use an alternative Obsidian Root Directory (default {OBSIDIAN_ROOT_DIR!r})')
-    parser.add_argument('--rm', action='store_true', help='with --update, remove .obsidian and create again, rather than retain old .obsidian files')
     only_one_of = parser.add_mutually_exclusive_group(required=True)
     only_one_of.add_argument('--list', '-l', action='store_true', help='list Obsidian vaults')
     only_one_of.add_argument('--update', '-u', help='update Obsidian vaults from UPDATE vault')
+    only_one_of.add_argument('--exact-copy-of', help='delete and recreate Obsidian vaults with an exact copy of the EXACT_COPY_OF vault')
     only_one_of.add_argument('--diff-to', '-d', help='Like update but instead of copying, just show a diff against DIFF_TO instead (no changes made).')
     only_one_of.add_argument('--execute', '-x', help='run EXECUTE command within each vault (use caution!)')
     only_one_of.add_argument('--backup-list', action='store_true', help='list ISO 8601-formatted .obsidian backup files from all vaults')
@@ -117,10 +117,10 @@ def ensure_valid_vault(vault_paths, vault_to_check):
     call_for_each_vault(vault_paths, show_vault_path)
     exit(-1)
 
-def call_for_each_vault(vault_paths, operation, *args):
-    '''Call operation with each vault in vault_paths, followed by *args.'''
+def call_for_each_vault(vault_paths, operation, *args, **kwargs):
+    '''Call operation with each vault in vault_paths, followed by *args and **kwargs.'''
     for vault_path in vault_paths:
-        operation(vault_path, *args)
+        operation(vault_path, *args, **kwargs)
 
 def backup(item, suffix):
     '''Rename item to have the given suffix.'''
@@ -192,7 +192,7 @@ def copy_settings_item(suffix, src, dest, itemname):
     else:
         copy_file(src_target, dest_target)
 
-def copy_settings(dest, src, clean_first):
+def copy_settings(dest, src, clean_first=False):
     '''
     Copy the usual settings items into dest vault from src.
 
@@ -300,7 +300,10 @@ def main():
             call_for_each_vault(vault_paths, show_vault_path)
         elif args.update:
             ensure_valid_vault(vault_paths, args.update)
-            call_for_each_vault(vault_paths, copy_settings, Path.home() / args.update, args.rm)
+            call_for_each_vault(vault_paths, copy_settings, Path.home() / args.update, clean_first=False)
+        elif args.exact_copy_of:
+            ensure_valid_vault(vault_paths, args.exact_copy_of)
+            call_for_each_vault(vault_paths, copy_settings, Path.home() / args.exact_copy_of, clean_first=True)
         elif args.diff_to:
             ensure_valid_vault(vault_paths, args.diff_to)
             call_for_each_vault(vault_paths, diff_settings, Path.home() / args.diff_to)
