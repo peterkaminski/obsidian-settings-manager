@@ -159,7 +159,32 @@ def init_argparse():
     return parser
 
 ###
-# Configuration Functions
+# Configuration Functions - OSM
+###
+
+def find_osm_config_file():
+    '''No configuration file was given, so let's go looking and return the first one in our priority list!'''
+    env_var_value = os.getenv(OSM_CONFIG_ENV_VAR_OVERRIDE)
+    if env_var_value:
+        return Path(env_var_value)
+    local_config = Path(OSM_CONFIG_FILE)
+    if local_config.is_file():
+        return local_config
+    home_config = Path.home() / OSM_CONFIG_FILE
+    if home_config.is_file():
+        return home_config
+    return None
+
+def load_osm_config(config_file=None):
+    '''Load our OSM configuration from the config_file if given, or from our hierarchy of places to look.'''
+    config_file = config_file or find_osm_config_file()
+    if config_file:
+        OSM_CONFIG.update(safe_load_json(safe_read_contents(config_file), f'Config file: {config_file}'))
+    else:
+        OSM_CONFIG.update(safe_load_json(OSM_DEFAULT_CONFIG, 'Built-in configuration data'))
+
+###
+# Configuration Functions - Obsidian
 ###
 
 def user_vault_paths_from(obsidian, root_dir):
