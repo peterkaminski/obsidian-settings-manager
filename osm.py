@@ -62,6 +62,16 @@ def safe_read_contents(filename, label, epilog=''):
             print(epilog)
         exit(-1)
 
+def lines_from(file_contents):
+    """Yield strip()'d lines from file_contents that aren't blank or comments."""
+
+    for line in file_contents.splitlines():
+        if not line:
+            continue  # Ignore blank lines
+        line = line.strip()  # Allow indentation, esp. for comments.
+        if line.startswith(CONFIG_COMMENT_MARKER):
+            continue
+        yield line
 
 def find_obsidian_default_root():
     '''
@@ -84,12 +94,7 @@ def find_obsidian_default_root():
 
     username = os.getlogin()
 
-    for line in config_contents.splitlines():
-        if not line:
-            continue  # Allow blank lines before, or in the middle of, the list of locations.
-        line = line.strip()  # Allow indentation, esp. for comments.
-        if line.startswith(CONFIG_COMMENT_MARKER):
-            continue
+    for line in lines_from(config_contents):
         potential_dir = line.replace('<username>', username)
         if Path(potential_dir).is_dir():
             OBSIDIAN_ROOT_DIR = potential_dir
@@ -98,16 +103,8 @@ def find_obsidian_default_root():
 
 
 def load_items_to_copy():
-
-    items_to_copy_contents = safe_read_contents(COPY_LIST_FILE, '')
-
-    for line in items_to_copy_contents.splitlines():
-        if not line:
-            continue  # Ignore blank lines
-        line = line.strip()  # Allow indentation, esp. for comments.
-        if line.startswith(CONFIG_COMMENT_MARKER):
-            continue
-        ITEMS_TO_COPY.append(line)
+    '''Load the items to copy file.'''
+    ITEMS_TO_COPY.extend(lines_from(safe_read_contents(COPY_LIST_FILE, '')))
 
 def verbose(*args, **kwargs):
     '''Print parameters if VERBOSE flag is True or DRY_RUN is True.'''
