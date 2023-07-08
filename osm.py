@@ -27,7 +27,7 @@ OBSIDIAN_CONFIG_DIRS = 'obsidian_config_dirs.txt'
 CONFIG_DIRECTORIES_TRIED = []  # Keep track of what we tried for a nice failure message if needed.
 OBSIDIAN_ROOT_DIR = os.getenv('OBSIDIAN_ROOT', '')
 
-COPY_LIST_FILE = "copy-list.txt"
+COPY_LIST_FILE = 'copy-list.txt'
 ITEMS_TO_COPY = []  # Values to be loaded from COPY_LIST_FILE
 
 def datestring():
@@ -45,6 +45,24 @@ DRY_RUN = False
 DIFF_CMD = ''
 '''When not '', it is set to the absolute path of the diff command to use.'''
 
+def safe_read_contents(filename, label, epilog=''):
+    '''
+    Return the contents of filename.
+
+    If there is an error opening or reading the file,
+    print the label, filename, short error description, epilog if given, and exit.
+    '''
+    try:
+        return Path(filename).read_text()
+    except Exception as e:
+        print()
+        print(f'Error reading {label}: {filename!r}')
+        print(e)
+        if epilog:
+            print(epilog)
+        exit(-1)
+
+
 def find_obsidian_default_root():
     '''
     Scan the the Default Root Config file for Obsidian's configuration directory.
@@ -58,14 +76,11 @@ def find_obsidian_default_root():
     if OBSIDIAN_ROOT_DIR:
         return  # Has already been overridden with an environment variable, no need to check.
 
-    try:
-        config_contents = Path(OBSIDIAN_CONFIG_DIRS).read_text()
-    except Exception as e:
-        print()
-        print(f'Error reading the Obsidian configuration file: {OBSIDIAN_CONFIG_DIRS!r}')
-        print(e)
-        print("If you don't want this file, set the environment variable OBSIDIAN_ROOT (see README.md for details).")
-        exit(-1)
+    config_contents = safe_read_contents(
+        OBSIDIAN_CONFIG_DIRS,
+        'the Obsidian configuration file',
+        epilog="If you don't want this file, set the environment variable OBSIDIAN_ROOT (see README.md for details)."
+    )
 
     username = os.getlogin()
 
