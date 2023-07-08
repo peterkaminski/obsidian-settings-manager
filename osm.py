@@ -64,7 +64,7 @@ def init_argparse():
     only_one_of = parser.add_mutually_exclusive_group(required=True)
     only_one_of.add_argument('--list', '-l', action='store_true', help='list Obsidian vaults')
     only_one_of.add_argument('--update', '-u', help='update Obsidian vaults from UPDATE vault')
-    only_one_of.add_argument('--exact-copy-of', help='delete and recreate Obsidian vaults with an exact copy of OVERWRITE vault')
+    only_one_of.add_argument('--exact-copy-of', help='delete and recreate Obsidian vaults with an exact copy of the EXACT_COPY_OF vault')
     only_one_of.add_argument('--diff-to', '-d', help='Like update but instead of copying, just show a diff against DIFF_TO instead (no changes made).')
     only_one_of.add_argument('--execute', '-x', help='run EXECUTE command within each vault (use caution!)')
     only_one_of.add_argument('--backup-list', action='store_true', help='list ISO 8601-formatted .obsidian backup files from all vaults')
