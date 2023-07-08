@@ -61,16 +61,38 @@ from pathlib import Path
 # Globals
 ###
 
-DEFAULT_OBSIDIAN_ROOT = str(Path.home() / 'Library' / 'Application Support' / 'obsidian')
-OBSIDIAN_ROOT_DIR = os.getenv('OBSIDIAN_ROOT', DEFAULT_OBSIDIAN_ROOT)
+OSM_CONFIG_FILE = "osm.config"
+OSM_CONFIG_ENV_VAR_OVERRIDE = "OSM_CONFIG_FILE"
+OSM_CONFIG = {}  # Will be replaced (using .update()) by the config data we end up loading.
+OSM_DEFAULT_CONFIG = '''
+{
+    "obsidian_config": {
+        "config_file": "obsidian.json",
+        "search_path": [
+            "/Users/<username>/Library/Application Support/obsidian",
+            "/home/<username>/.config/obsidian",
+            "/home/<username>/.var/app/md.obsidian.Obsidian/config/obsidian",
+            "C:\\Users\\<username>\\AppData\\obsidian"
+        ],
+        "config_file_override": null
+    },
+    "files_to_copy": [
+        { "copy": "README.md" },
+        { "copy": "config" },
+        { "copy": "*.json" },
+        { "skip": "app.json" },
+        { "skip": "core-plugins**" },
+        { "skip": "workspace*" },
+        { "skip": "command-palette.json" },
 
-ITEMS_TO_COPY = [
-    'config',
-    'starred.json',
-    'README.md',  # used for vaults distributed to others via git
-    'plugins',
-    'snippets',
-]
+        { "copy": "plugins" },
+        { "skip": "plugins/auto-note-mover" },
+
+        { "copy": "snippets" },
+        { "copy": "themes" }
+    ]
+}
+'''
 
 def datestring():
     '''Return the current date and time in UTC string format.'''
