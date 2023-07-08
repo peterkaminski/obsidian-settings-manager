@@ -2,7 +2,7 @@
 
 ## WARNING AND DISCLAIMER
 
-WARNING: This utility manipulates files in all vaults that Obsidian knows about. It is written to only fiddle with the files in .obsidian (and with the `--rm` flag, to delete the `.obsidian` directory and recreate it), and it is intended to be safe to use. HOWEVER, it is possible that unintentional data loss may occur, and so you should only use this utility if you have backups of all your files, and only if you understand the risks associated with using this utility.
+WARNING: This utility manipulates files in all vaults that Obsidian knows about. It is written to only fiddle with the files in .obsidian (and with the `--exact-copy-of` flag, to delete the `.obsidian` directory and recreate it), and it is intended to be safe to use. HOWEVER, it is possible that unintentional data loss may occur, and so you should only use this utility if you have backups of all your files, and only if you understand the risks associated with using this utility.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
@@ -97,7 +97,7 @@ In this example, there is an Obsidian vault directory at `Vaults/obsidian-settin
 
 The default operation is to rename existing files so they have a date string appended, as a simple backup, to avoid data loss.  For example, the file `config` would be renamed to something like `config-2021-05-23T23:57:24.141428Z`.  Other files in the `.obsidian` directory are not affected.
 
-If you prefer, you can have the utility nuke the whole `.obsidian` directory, and then create a new empty directory, to copy files into.  This reduces the clutter of the backups, at the expense of losing everything in the directory (including, for instance, `workspace` settings).  Obsidian is good about recreating files it needs in the directory, but please use `--rm` only if you understand the implications. In particular, consider making a separate backup of important `config` files from customized vaults.
+If you prefer, you can have the utility nuke the whole `.obsidian` directory, and then create a new empty directory, to copy files into.  This reduces the clutter of the backups, at the expense of losing everything in the directory (including, for instance, `workspace` settings).  Obsidian is good about recreating files it needs in the directory, but please use `--exact-copy-of` only if you understand the implications. In particular, consider making a separate backup of important `config` files from customized vaults. Also, do not use this option while Obsidian is running!
 
 The files and directories currently copied (as long as they exist in the source vault):
 
