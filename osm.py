@@ -9,6 +9,38 @@
 #
 ################################################################
 
+################################################################
+#
+# DESIGN GOALS:
+#
+# As this is a conceptually simple script for copying Obsidian
+# vault meta-data between vaults:
+#   1. One file that can be copied to where-ever the user wants.
+#   2. Default configuration that works out of the box.
+#   3. Independent configurtion that the user can choose to set
+#      up, regardless of where this script lives or is run from.
+#   4. Only use Batteries Included Python libraries so that no
+#      additional setup is needed to run this script.
+#
+# This script operates with two different "configuration files":
+#   1. Our own (OSM) configuration:
+#      a) Where to find the Obsidian configuration.
+#      b) What parts of the vaults should be copied.
+#   2. Obsidians configuration.
+#      a) The location of the Obsidian vaults and their
+#         individual vault-specifc configuration.
+#
+# CODE STRUCTURE:
+#
+#   1) Usual Python header materials
+#   2) Global Variables
+#   3) Generic utiltiy functions
+#   4) Configuration functions
+#   5) Action functions
+#
+################################################################
+
+
 VERSION = 'v0.3.2'
 APPNAME = 'Obsidian Settings Manager'
 
