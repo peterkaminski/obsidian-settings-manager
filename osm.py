@@ -32,11 +32,14 @@
 #
 # CODE STRUCTURE:
 #
-#   1) Usual Python header materials
-#   2) Global Variables
-#   3) Generic utiltiy functions
-#   4) Configuration functions
-#   5) Action functions
+# To keep this as a single runnable file, rather than having
+# separate utility modules, the code is organized into sections:
+#
+#   - Usual Python header materials
+#   - Global Variables
+#   - Generic utiltiy functions
+#   - Configuration functions
+#   - Action functions
 #
 ################################################################
 
@@ -53,6 +56,10 @@ import subprocess
 import sys
 import traceback
 from pathlib import Path
+
+###
+# Globals
+###
 
 DEFAULT_OBSIDIAN_ROOT = str(Path.home() / 'Library' / 'Application Support' / 'obsidian')
 OBSIDIAN_ROOT_DIR = os.getenv('OBSIDIAN_ROOT', DEFAULT_OBSIDIAN_ROOT)
@@ -72,7 +79,6 @@ def datestring():
 # Keep this in sync with the format returned by datestring()
 ISO_8601_GLOB = '*-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'
 
-
 VERBOSE = False
 
 DRY_RUN = False
@@ -80,29 +86,16 @@ DRY_RUN = False
 DIFF_CMD = ''
 '''When not '', it is set to the absolute path of the diff command to use.'''
 
+###
+# Generic Utility Functions
+###
+
 def verbose(*args, **kwargs):
     '''Print parameters if VERBOSE flag is True or DRY_RUN is True.'''
     if DRY_RUN:
         print('DRY-RUN:' if args else '', *args, **kwargs)
     elif VERBOSE:
         print(*args, **kwargs)
-
-def init_argparse():
-    '''Return an initialized command line parser.'''
-    parser = argparse.ArgumentParser(description='Manage Obsidian settings across multiple vaults.')
-    parser.add_argument('--verbose', action='store_true', help='Print what the file system operations are happening')
-    parser.add_argument('--dry-run', '-n', action='store_true', help='Do a dry-run. Show what would be done, without doing it.')
-    parser.add_argument('--root', default=OBSIDIAN_ROOT_DIR, help=f'Use an alternative Obsidian Root Directory (default {OBSIDIAN_ROOT_DIR!r})')
-    only_one_of = parser.add_mutually_exclusive_group(required=True)
-    only_one_of.add_argument('--list', '-l', action='store_true', help='list Obsidian vaults')
-    only_one_of.add_argument('--update', '-u', help='update Obsidian vaults from UPDATE vault')
-    only_one_of.add_argument('--exact-copy-of', help='delete and recreate Obsidian vaults with an exact copy of the EXACT_COPY_OF vault')
-    only_one_of.add_argument('--diff-to', '-d', help='Like update but instead of copying, just show a diff against DIFF_TO instead (no changes made).')
-    only_one_of.add_argument('--execute', '-x', help='run EXECUTE command within each vault (use caution!)')
-    only_one_of.add_argument('--backup-list', action='store_true', help='list ISO 8601-formatted .obsidian backup files from all vaults')
-    only_one_of.add_argument('--backup-remove', action='store_true', help='remove ISO 8601-formatted .obsidian backup files from all vaults')
-    only_one_of.add_argument('--version', '-v', action='store_true', help='show version and exit')
-    return parser
 
 def safe_read_contents(from_file):
     '''Return the contents of from_file, or exit with an error message if open/read fails.'''
@@ -125,6 +118,27 @@ def safe_load_json(from_contents, source):
 def is_user_path(root_dir, path_to_test):
     '''Return True if path_to_test is a user's path, not an Obsidian system path (such as Help, etc)'''
     return Path(path_to_test).parent != root_dir
+
+def init_argparse():
+    '''Return an initialized command line parser.'''
+    parser = argparse.ArgumentParser(description='Manage Obsidian settings across multiple vaults.')
+    parser.add_argument('--verbose', action='store_true', help='Print what the file system operations are happening')
+    parser.add_argument('--dry-run', '-n', action='store_true', help='Do a dry-run. Show what would be done, without doing it.')
+    parser.add_argument('--root', default=OBSIDIAN_ROOT_DIR, help=f'Use an alternative Obsidian Root Directory (default {OBSIDIAN_ROOT_DIR!r})')
+    only_one_of = parser.add_mutually_exclusive_group(required=True)
+    only_one_of.add_argument('--list', '-l', action='store_true', help='list Obsidian vaults')
+    only_one_of.add_argument('--update', '-u', help='update Obsidian vaults from UPDATE vault')
+    only_one_of.add_argument('--exact-copy-of', help='delete and recreate Obsidian vaults with an exact copy of the EXACT_COPY_OF vault')
+    only_one_of.add_argument('--diff-to', '-d', help='Like update but instead of copying, just show a diff against DIFF_TO instead (no changes made).')
+    only_one_of.add_argument('--execute', '-x', help='run EXECUTE command within each vault (use caution!)')
+    only_one_of.add_argument('--backup-list', action='store_true', help='list ISO 8601-formatted .obsidian backup files from all vaults')
+    only_one_of.add_argument('--backup-remove', action='store_true', help='remove ISO 8601-formatted .obsidian backup files from all vaults')
+    only_one_of.add_argument('--version', '-v', action='store_true', help='show version and exit')
+    return parser
+
+###
+# Configuration Functions
+###
 
 def user_vault_paths_from(obsidian, root_dir):
     '''Return the paths for each vault in obsidian that isn't a system vault.'''
@@ -162,6 +176,10 @@ def call_for_each_vault(vault_paths, operation, *args, **kwargs):
     '''Call operation with each vault in vault_paths, followed by *args and **kwargs.'''
     for vault_path in vault_paths:
         operation(vault_path, *args, **kwargs)
+
+###
+# Action Functions
+###
 
 def backup(item, suffix):
     '''Rename item to have the given suffix.'''
@@ -312,6 +330,10 @@ def backup_list_operation(vault_path, operation):
 def show_vault_path(vault_path):
     '''Print the vault path relative to the user's home directory (more readable).'''
     print(Path(vault_path).relative_to(Path.home()))
+
+###
+# MAIN
+###
 
 def main():
     argparser = init_argparse()
