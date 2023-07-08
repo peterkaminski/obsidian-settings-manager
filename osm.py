@@ -64,7 +64,7 @@ from pathlib import Path
 OSM_CONFIG_FILE = "osm.config"
 OSM_CONFIG_ENV_VAR_OVERRIDE = "OSM_CONFIG_FILE"
 OSM_CONFIG = {}  # Will be replaced (using .update()) by the config data we end up loading.
-OSM_DEFAULT_CONFIG = '''
+OSM_DEFAULT_CONFIG = r'''
 {
     "obsidian_config": {
         "config_file": "obsidian.json",
