@@ -22,8 +22,10 @@ import sys
 import traceback
 from pathlib import Path
 
-DEFAULT_OBSIDIAN_ROOT = str(Path.home() / 'Library' / 'Application Support' / 'obsidian')
-OBSIDIAN_ROOT_DIR = os.getenv('OBSIDIAN_ROOT', DEFAULT_OBSIDIAN_ROOT)
+CONFIG_COMMENT_MARKER = '#'  # Any line starting with this is ignored.
+OBSIDIAN_CONFIG_DIRS = 'obsidian_config_dirs.txt'
+CONFIG_DIRECTORIES_TRIED = []  # Keep track of what we tried for a nice failure message if needed.
+OBSIDIAN_ROOT_DIR = os.getenv('OBSIDIAN_ROOT', '')
 
 ITEMS_TO_COPY = [
     'config',
@@ -47,6 +49,43 @@ DRY_RUN = False
 
 DIFF_CMD = ''
 '''When not '', it is set to the absolute path of the diff command to use.'''
+
+def find_obsidian_default_root():
+    '''
+    Scan the the Default Root Config file for Obsidian's configuration directory.
+
+    Each directory checked is tracked for helpful user error messaging,
+    and the first directory found is used.
+    '''
+
+    global OBSIDIAN_ROOT_DIR
+
+    if OBSIDIAN_ROOT_DIR:
+        return  # Has already been overridden with an environment variable, no need to check.
+
+    try:
+        config_contents = Path(OBSIDIAN_CONFIG_DIRS).read_text()
+    except Exception as e:
+        print()
+        print(f'Error reading the Obsidian configuration file: {OBSIDIAN_CONFIG_DIRS!r}')
+        print(e)
+        print("If you don't want this file, set the environment variable OBSIDIAN_ROOT (see README.md for details).")
+        exit(-1)
+
+    username = os.getlogin()
+
+    for line in config_contents.splitlines():
+        if not line:
+            continue  # Allow blank lines before, or in the middle of, the list of locations.
+        line = line.strip()  # Allow indentation, esp. for comments.
+        if line.startswith(CONFIG_COMMENT_MARKER):
+            continue
+        potential_dir = line.replace('<username>', username)
+        if Path(potential_dir).is_dir():
+            OBSIDIAN_ROOT_DIR = potential_dir
+            return
+        CONFIG_DIRECTORIES_TRIED.append(potential_dir)
+
 
 def verbose(*args, **kwargs):
     '''Print parameters if VERBOSE flag is True or DRY_RUN is True.'''
@@ -236,7 +275,7 @@ def diff_settings(dest, src):
     '''
     Diff the settings between src and dest that would be updated if udpate were used.
 
-    Note that the diffs are done between dest and src to show src as "the new" stuff.
+    Note that the diffs are done between dest and src to show src as 'the new' stuff.
     '''
     src = Path(src)
     dest = Path(dest)
@@ -273,8 +312,19 @@ def show_vault_path(vault_path):
     print(Path(vault_path).relative_to(Path.home()))
 
 def main():
+    find_obsidian_default_root()
     argparser = init_argparse()
     args = argparser.parse_args()
+
+    if not args.root:
+        print()
+        print('Error: unable to find your Obsidian configuration directory after checking these locations:')
+        for a_dir in CONFIG_DIRECTORIES_TRIED:
+            print('   ', a_dir)
+        print()
+        print('You can use --root or set the OBSIDIAN_ROOT environment variable if needed.')
+        print('See the README.md file for details.')
+        exit(-1)
 
     if args.verbose:
         global VERBOSE
