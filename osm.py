@@ -27,13 +27,8 @@ OBSIDIAN_CONFIG_DIRS = 'obsidian_config_dirs.txt'
 CONFIG_DIRECTORIES_TRIED = []  # Keep track of what we tried for a nice failure message if needed.
 OBSIDIAN_ROOT_DIR = os.getenv('OBSIDIAN_ROOT', '')
 
-ITEMS_TO_COPY = [
-    'config',
-    'starred.json',
-    'README.md',  # used for vaults distributed to others via git
-    'plugins',
-    'snippets',
-]
+COPY_LIST_FILE = "copy-list.txt"
+ITEMS_TO_COPY = []  # Values to be loaded from COPY_LIST_FILE
 
 def datestring():
     '''Return the current date and time in UTC string format.'''

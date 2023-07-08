@@ -1,0 +1,7 @@
+# used for vaults distributed to others via git
+README.md
+
+config
+starred.json
+plugins
+snippets
