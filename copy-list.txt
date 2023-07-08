@@ -5,3 +5,19 @@ config
 starred.json
 plugins
 snippets
+
+# Files from the Linux config (in the top level config directory, not captured by 'config' above):
+
+appearance.json
+app.json
+backlink.json
+command-palette.json
+community-plugins.json
+core-plugins.json
+core-plugins-migration.json
+file-recovery.json
+global-search.json
+graph.json
+hotkeys.json
+templates.json
+themes
