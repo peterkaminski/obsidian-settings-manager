@@ -97,6 +97,18 @@ def find_obsidian_default_root():
         CONFIG_DIRECTORIES_TRIED.append(potential_dir)
 
 
+def load_items_to_copy():
+
+    items_to_copy_contents = safe_read_contents(COPY_LIST_FILE, '')
+
+    for line in items_to_copy_contents.splitlines():
+        if not line:
+            continue  # Ignore blank lines
+        line = line.strip()  # Allow indentation, esp. for comments.
+        if line.startswith(CONFIG_COMMENT_MARKER):
+            continue
+        ITEMS_TO_COPY.append(line)
+
 def verbose(*args, **kwargs):
     '''Print parameters if VERBOSE flag is True or DRY_RUN is True.'''
     if DRY_RUN:
@@ -323,6 +335,7 @@ def show_vault_path(vault_path):
 
 def main():
     find_obsidian_default_root()
+    load_items_to_copy()
     argparser = init_argparse()
     args = argparser.parse_args()
 
