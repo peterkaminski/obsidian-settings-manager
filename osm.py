@@ -195,7 +195,7 @@ def find_osm_config_file():
     env_var_value = os.getenv(OSM_CONFIG_ENV_VAR_OVERRIDE)
     config_trace(f'OSM Config checking environment variable: {env_var_value!r}')
     if env_var_value:
-        return Path(env_var_value)
+        return Path(env_var_value).expanduser()
 
     local_config = Path(OSM_CONFIG_FILE)
     config_trace(f'OSM Config checking local directory: {local_config}')
@@ -229,7 +229,7 @@ def find_obsidian_config_file():
     obsidian_config = must_get_key(OSM_CONFIG, 'obsidian_config', 'from top level OSM configuration file')
     config_file_name = obsidian_config.get('config_file_override')
     if config_file_name:
-        config_file = Path(config_file_name)
+        config_file = Path(config_file_name).expanduser()
         if config_file.is_file():
             return config_file
         print(f'Unable to find Obsidian configuration file: {config_file_name!r}')
