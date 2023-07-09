@@ -312,7 +312,7 @@ def get_items_to_copy(src):
     The return value is also cached in the ITEMS_TO_COPY list so we only build the list once.
     '''
     if not ITEMS_TO_COPY:
-        ITEMS_TO_COPY.extend(process_action_list_in(src, ACTIONS_TO_TAKE))
+        ITEMS_TO_COPY.extend(sorted(process_action_list_in(src, ACTIONS_TO_TAKE)))
     return ITEMS_TO_COPY
 
 ###
