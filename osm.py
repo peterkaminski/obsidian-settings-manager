@@ -112,6 +112,9 @@ OSM_DEFAULT_CONFIG = r'''
 
 OBSIDIAN_CONFIG = {}  # Will be .updated() with the obsidian configuration file data.
 
+ACTIONS_TO_TAKE = []  # Will be updated with the file actions are processed from the OSM config.
+ITEMS_TO_COPY = []  # Path() file objects; updated when FILE_ACTIONS are applied to a source vault.
+
 def datestring():
     '''Return the current date and time in UTC string format.'''
     return f'-{datetime.datetime.utcnow().isoformat()}Z'
@@ -211,6 +214,34 @@ def init_argparse():
     only_one_of.add_argument('--version', '-v', action='store_true', help='show version and exit')
     return parser
 
+def only_relative_files_from(item_list, relative_to):
+    '''Return a list of just the files from item_list.'''
+    return [item.relative_to(relative_to) for item in item_list if item.is_file()]
+
+def get_matching_files(source_dir, item):
+    '''
+    Returns a list of relative Path objects for all the files described by item.
+
+    Files are a list of themselves.
+    Directories are the list of files in them, recursively.
+    Globs are whatever files match the glob, if any.
+    '''
+    item_path = source_dir / item
+    if item_path.is_file():
+        return [Path(item)]
+    if item_path.is_dir():
+        return only_relative_files_from(item_path.rglob('*'), source_dir)
+    return only_relative_files_from(source_dir.glob(item), source_dir)
+
+def process_action_list_in(source_dir, actions_list):
+    '''Return a list of Path files to copy by applying the actions list actions to source_dir.'''
+    files = set()
+    source_dir = Path(source_dir)
+    for action, item in actions_list:
+        for a_file in get_matching_files(source_dir, item):
+            action(files, a_file)
+    return files
+
 ###
 # Configuration Functions - OSM
 ###
@@ -273,6 +304,16 @@ def get_processing_directives():
             # Actions must be strings to pass JSON parsing, not checking their type here.
             operation = must_get_key(FILE_ACTIONS, action, BAD_ACTION_MSG)
             yield (operation, must_be_type(item, str, BAD_ITEM_MSG))
+
+def get_items_to_copy(src):
+    '''
+    Return the list of Paths to be copied from src.
+
+    The return value is also cached in the ITEMS_TO_COPY list so we only build the list once.
+    '''
+    if not ITEMS_TO_COPY:
+        ITEMS_TO_COPY.extend(process_action_list_in(src, ACTIONS_TO_TAKE))
+    return ITEMS_TO_COPY
 
 ###
 # Configuration Functions - Obsidian
@@ -448,7 +489,7 @@ def copy_settings(dest, src, clean_first=False):
     if clean_first:
         recreate_dir(dest)
 
-    for item in ITEMS_TO_COPY:
+    for item in get_items_to_copy(src):
         copy_settings_item(suffix, src, dest, item)
 
 def do_diff(old, new):
@@ -479,7 +520,7 @@ def diff_settings(dest, src):
     src = src / '.obsidian'
     dest = dest / '.obsidian'
 
-    for item in ITEMS_TO_COPY:
+    for item in get_items_to_copy(src):
         dest_item = dest / item
         src_item = src / item
         if src_item.exists() and dest_item.exists():
@@ -538,7 +579,7 @@ def main():
 
     try:
         vault_paths = get_vault_paths()
-        directives = list(get_processing_directives())
+        ACTIONS_TO_TAKE.extend(get_processing_directives())
 
         if args.list:
             call_for_each_vault(vault_paths, show_vault_path)
