@@ -136,7 +136,7 @@ FILE_ACTIONS = {
 
 # Dedup and condense some error message strings.
 # Good for humans to read, but clutters up code when they're inline.
-BAD_ACTION_MSG = 'OSM Configuration action(key) in "files_to_copy" list:'
+BAD_ACTION_MSG = 'is an unknown/invalid action in OSM Configuration in the "files_to_copy" list'
 BAD_ITEM_MSG = 'OSM Configuration item (value) in "files_to_copy" list:'
 
 ###
