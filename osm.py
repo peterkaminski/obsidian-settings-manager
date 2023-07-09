@@ -126,6 +126,14 @@ def verbose(*args, **kwargs):
     elif VERBOSE:
         print(*args, **kwargs)
 
+def must_get_key(a_dict, key, aux_msg):
+    '''Return the value of key from a_dict, or print an descriptive error message and exit.'''
+    try:
+        return a_dict[key]
+    except Exception:
+        print(f'Error, missing key {key!r} {aux_msg}')
+        exit(-1)
+ 
 def safe_read_contents(from_file):
     '''Return the contents of from_file, or exit with an error message if open/read fails.'''
     try:
