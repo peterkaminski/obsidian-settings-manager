@@ -252,6 +252,7 @@ def find_obsidian_config_file():
 def load_obsidian_config():
     '''Find and load the obsidian config file after having loaded our own config file.'''
     config_file = find_obsidian_config_file()
+    config_trace("Loading Obsidian configuration from", config_file)
     remember_obsidian_root_dir(config_file.parent)
     OBSIDIAN_CONFIG.update(safe_load_json(safe_read_contents(config_file), f'Obsidian config file: {config_file}'))
 
@@ -478,7 +479,7 @@ def main():
             print("Error: Cannot locate the 'diff' command, aborting.")
             exit(-1)
 
-    load_osm_config()
+    load_osm_config(args.config)
     load_obsidian_config()
 
     try:
