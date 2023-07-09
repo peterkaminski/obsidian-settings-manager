@@ -41,6 +41,20 @@
 #   - Configuration functions
 #   - Action functions
 #
+# DATA STRUCTURES
+#
+# Configurations:
+#   - JSON converted to Python.
+# Files To Copy:
+#   - A list of actions and their items (see the README)
+#   - A set of files to copy(or diff) is constructed from
+#     sequentially processing the actions in the configuration.
+#   - Each action is mapped to a set function to be applied
+#     to the resulting list of files derived from the items.
+#   - The items indicate where to find the desired files,
+#     with the actual list of files depending on the contents of
+#     the source vault at the time of examination.
+#
 ################################################################
 
 
@@ -113,6 +127,17 @@ CONFIG_TRACE = os.getenv('CONFIG_TRACE', False)
 
 DIFF_CMD = ''
 '''When not '', it is set to the absolute path of the diff command to use.'''
+
+# Map "files_to_copy" actions to functions for managing the set of files to operate on.
+FILE_ACTIONS = {
+    "copy": set.add,
+    "skip": set.discard
+}
+
+# Dedup and condense some error message strings.
+# Good for humans to read, but clutters up code when they're inline.
+BAD_ACTION_MSG = 'OSM Configuration action(key) in "files_to_copy" list:'
+BAD_ITEM_MSG = 'OSM Configuration item (value) in "files_to_copy" list:'
 
 ###
 # Generic Utility Functions
@@ -227,6 +252,27 @@ def load_osm_config(config_file=None):
     else:
         config_trace('Loading OSM configuration from internal default configuration')
         OSM_CONFIG.update(safe_load_json(OSM_DEFAULT_CONFIG, 'Built-in configuration data'))
+
+def get_processing_directives():
+    '''
+    Yield a series of (function, item) pairs from the files to copy from a source vault.
+
+    If there are any errors in the config file, print a descriptive error message and exit.
+    Each returned function should be called with a set and a filename.
+    '''
+    directives = must_get_key(OSM_CONFIG, 'files_to_copy', 'in OSM configuration')
+    must_be_type(directives, list, 'OSM Configuration key "files_to_copy"')
+
+    for directive in directives:
+        must_be_type(directive, dict, 'OSM Configuration value under "files_to_copy"')
+        # Having more than one action type per step seems confusing, so limit to just 1.
+        if len(directive) != 1:
+            print(f'Error: OSM Configuration list elements under "files_to_copy" must have only one key: {directive!r}')
+            exit(-1)
+        for action, item in directive.items():  # Easiest way to access the contents even when there is only one key/value pair.
+            # Actions must be strings to pass JSON parsing, not checking their type here.
+            operation = must_get_key(FILE_ACTIONS, action, BAD_ACTION_MSG)
+            yield (operation, must_be_type(item, str, BAD_ITEM_MSG))
 
 ###
 # Configuration Functions - Obsidian
@@ -492,6 +538,7 @@ def main():
 
     try:
         vault_paths = get_vault_paths()
+        directives = list(get_processing_directives())
 
         if args.list:
             call_for_each_vault(vault_paths, show_vault_path)
