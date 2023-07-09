@@ -210,6 +210,7 @@ def init_argparse():
     only_one_of.add_argument('--execute', '-x', help='run EXECUTE command within each vault (use caution!)')
     only_one_of.add_argument('--backup-list', action='store_true', help='list ISO 8601-formatted .obsidian backup files from all vaults')
     only_one_of.add_argument('--backup-remove', action='store_true', help='remove ISO 8601-formatted .obsidian backup files from all vaults')
+    only_one_of.add_argument('--show-selected', dest="from_vault", help='print the files that would be copied from FROM_VAULT to other vaults, then exit')
     only_one_of.add_argument('--print-default-config', action='store_true', help='print the default configuration and extt')
     only_one_of.add_argument('--version', '-v', action='store_true', help='show version and exit')
     return parser
@@ -392,6 +393,12 @@ def call_for_each_vault(vault_paths, operation, *args, **kwargs):
 def print_default_config():
     '''Print the default configuration so user can save and customize.'''
     print(OSM_DEFAULT_CONFIG)
+
+def show_selected_files_for(vault):
+    '''Print the files that would be copied from vault.'''
+    print("These files would be copied from", vault)
+    for a_file in get_items_to_copy(Path(vault) / '.obsidian'):
+        print("   ", a_file)
 
 def backup(item, suffix):
     '''Rename item to have the given suffix.'''
@@ -583,6 +590,9 @@ def main():
 
         if args.list:
             call_for_each_vault(vault_paths, show_vault_path)
+        elif args.from_vault:
+            ensure_valid_vault(vault_paths, args.from_vault)
+            show_selected_files_for(Path.home() / args.from_vault)
         elif args.update:
             ensure_valid_vault(vault_paths, args.update)
             call_for_each_vault(vault_paths, copy_settings, Path.home() / args.update, clean_first=False)
