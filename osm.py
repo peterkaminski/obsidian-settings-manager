@@ -174,6 +174,7 @@ def init_argparse():
     only_one_of.add_argument('--execute', '-x', help='run EXECUTE command within each vault (use caution!)')
     only_one_of.add_argument('--backup-list', action='store_true', help='list ISO 8601-formatted .obsidian backup files from all vaults')
     only_one_of.add_argument('--backup-remove', action='store_true', help='remove ISO 8601-formatted .obsidian backup files from all vaults')
+    only_one_of.add_argument('--print-default-config', action='store_true', help='print the default configuration and extt')
     only_one_of.add_argument('--version', '-v', action='store_true', help='show version and exit')
     return parser
 
@@ -291,6 +292,10 @@ def call_for_each_vault(vault_paths, operation, *args, **kwargs):
 ###
 # Action Functions
 ###
+
+def print_default_config():
+    '''Print the default configuration so user can save and customize.'''
+    print(OSM_DEFAULT_CONFIG)
 
 def backup(item, suffix):
     '''Rename item to have the given suffix.'''
@@ -458,6 +463,14 @@ def main():
         global DRY_RUN
         DRY_RUN = True
 
+    if args.version:
+        print(f'{APPNAME} {VERSION}')
+        return
+
+    if args.print_default_config:
+        print_default_config()
+        return
+
     if args.diff_to:
         global DIFF_CMD
         DIFF_CMD = shutil.which('diff')
@@ -471,9 +484,7 @@ def main():
     try:
         vault_paths = get_vault_paths()
 
-        if args.version:
-            print(f'{APPNAME} {VERSION}')
-        elif args.list:
+        if args.list:
             call_for_each_vault(vault_paths, show_vault_path)
         elif args.update:
             ensure_valid_vault(vault_paths, args.update)
