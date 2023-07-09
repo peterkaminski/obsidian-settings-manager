@@ -64,6 +64,8 @@ from pathlib import Path
 OSM_CONFIG_FILE = 'osm.config'
 OSM_CONFIG_ENV_VAR_OVERRIDE = 'OSM_CONFIG_FILE'
 OSM_CONFIG = {}  # Will be replaced (using .update()) by the config data we end up loading.
+# NOTE: Documented keys in the OSM Config should not start with an underscore (_),
+#       as the running code will add new keys with that prefix (using helper functions).
 OSM_DEFAULT_CONFIG = r'''
 {
     "obsidian_config": {
@@ -179,6 +181,14 @@ def init_argparse():
 # Configuration Functions - OSM
 ###
 
+def remember_obsidian_root_dir(value):
+    '''Keep track of where the Obsidian root directory was by adding it to our config.'''
+    OSM_CONFIG['_obsidian_root_dir'] = value
+
+def get_obsidian_root_dir():
+    '''Return the Obsidian root directory saved in our config.'''
+    return OSM_CONFIG['_obsidian_root_dir']
+
 def find_osm_config_file():
     '''Return the first OSM config file we find from our priority list, or None.'''
     env_var_value = os.getenv(OSM_CONFIG_ENV_VAR_OVERRIDE)
@@ -241,25 +251,23 @@ def find_obsidian_config_file():
 def load_obsidian_config():
     '''Find and load the obsidian config file after having loaded our own config file.'''
     config_file = find_obsidian_config_file()
+    remember_obsidian_root_dir(config_file.parent)
     OBSIDIAN_CONFIG.update(safe_load_json(safe_read_contents(config_file), f'Obsidian config file: {config_file}'))
 
-def user_vault_paths_from(obsidian, root_dir):
+def user_vault_paths(root_dir):
     '''Return the paths for each vault in obsidian that isn't a system vault.'''
     # The vaults' dictionary's keys aren't of any use/interest to us,
     # so we only need to look the path defined in the vault.
-    return [vault_data['path'] for vault_data in obsidian['vaults'].values()
+    return [vault_data['path'] for vault_data in OBSIDIAN_CONFIG['vaults'].values()
             if is_user_path(root_dir, vault_data['path'])]
 
-def get_vault_paths(root_dir):
+def get_vault_paths():
     '''
     Return a list of all the vault paths Obsidian is tracking.
 
     The list is string version of the absolute paths for the the vaults.
     '''
-    root_dir = Path(root_dir)
-    obsidian_config = root_dir / 'obsidian.json'
-    obsidian = safe_load_json(safe_read_contents(obsidian_config), f'Obsidian config file: {obsidian_config}')
-    return sorted(user_vault_paths_from(obsidian, root_dir), key=str.lower)
+    return sorted(user_vault_paths(get_obsidian_root_dir()), key=str.lower)
 
 # It might be cleaner to have this defined after the functions it calls,
 # but keeping it close to get_vault_paths to make it easier to track changes if needed.
@@ -461,7 +469,7 @@ def main():
     load_obsidian_config()
 
     try:
-        vault_paths = get_vault_paths(args.root)
+        vault_paths = get_vault_paths()
 
         if args.version:
             print(f'{APPNAME} {VERSION}')
