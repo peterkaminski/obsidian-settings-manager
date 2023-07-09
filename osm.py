@@ -137,7 +137,15 @@ def must_get_key(a_dict, key, aux_msg):
     except Exception:
         print(f'Error, missing key {key!r} {aux_msg}')
         exit(-1)
- 
+
+def must_be_type(item, type_, prefix_msg):
+    '''If item is an instance of type_, return it for convenience, or print a descriptive error message and exit.'''
+    if isinstance(item, type_):
+        return item
+    print(f'Error: {prefix_msg} {type(item).__name__}: {item!r} is not a {type_.__name__}')
+    exit(-1)
+
+
 def safe_read_contents(from_file):
     '''Return the contents of from_file, or exit with an error message if open/read fails.'''
     try:
