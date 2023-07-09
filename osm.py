@@ -94,6 +94,8 @@ OSM_DEFAULT_CONFIG = r'''
 }
 '''
 
+OBSIDIAN_CONFIG = {}  # Will be .updated() with the obsidian configuration file data.
+
 def datestring():
     '''Return the current date and time in UTC string format.'''
     return f'-{datetime.datetime.utcnow().isoformat()}Z'
@@ -194,7 +196,7 @@ def find_osm_config_file():
     if home_config.is_file():
         return home_config
 
-    config_trace(f'OSM Config not found')
+    config_trace('OSM Config not found')
     return None
 
 def load_osm_config(config_file=None):
@@ -210,6 +212,36 @@ def load_osm_config(config_file=None):
 ###
 # Configuration Functions - Obsidian
 ###
+
+def find_obsidian_config_file():
+    '''Return the Path for the Obsidian config file from our configuration, or print an error message and exit if not found.'''
+    obsidian_config = must_get_key(OSM_CONFIG, 'obsidian_config', 'from top level OSM configuration file')
+    config_file_name = obsidian_config.get('config_file_override')
+    if config_file_name:
+        config_file = Path(config_file_name)
+        if config_file.is_file():
+            return config_file
+        print(f'Unable to find Obsidian configuration file: {config_file_name!r}')
+        print("from the 'config_file_override' configuration value.")
+        exit(-1)
+    config_file_base_name = must_get_key(obsidian_config, 'config_file', 'from the obsdian_config part of the OSM configuration file')
+    config_file_search_path = must_get_key(obsidian_config, 'search_path', 'from the obsdian_config part of the OSM configuration file')
+    username = os.getlogin()
+    checked_files = []
+    for a_dir in config_file_search_path:
+        candidate = Path(a_dir.replace("<username>", username)) / config_file_base_name
+        checked_files.append(candidate)
+        if candidate.is_file():
+            config_trace('Found Obsidian config file:', candidate)
+            return candidate
+    print("Error, could not locate Obsidian configuration file after checking all of:")
+    print("\n".join(map(str, checked_files)))
+    exit(-1)
+
+def load_obsidian_config():
+    '''Find and load the obsidian config file after having loaded our own config file.'''
+    config_file = find_obsidian_config_file()
+    OBSIDIAN_CONFIG.update(safe_load_json(safe_read_contents(config_file), f'Obsidian config file: {config_file}'))
 
 def user_vault_paths_from(obsidian, root_dir):
     '''Return the paths for each vault in obsidian that isn't a system vault.'''
@@ -426,6 +458,7 @@ def main():
             exit(-1)
 
     load_osm_config()
+    load_obsidian_config()
 
     try:
         vault_paths = get_vault_paths(args.root)
