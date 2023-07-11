@@ -540,7 +540,7 @@ def diff_settings(dest, src):
         # If neither exist, nothing to do, nothing to say. Move along.
 
 
-def backup_list_operation(vault_path, operation):
+def backup_operation(vault_path, operation):
     '''Call operation with each backup item found in the given vault.'''
     dir_path = Path(vault_path) / '.obsidian'
     for dest in dir_path.glob(ISO_8601_GLOB):
@@ -603,9 +603,9 @@ def main():
             ensure_valid_vault(vault_paths, args.diff_to)
             call_for_each_vault(vault_paths, diff_settings, Path.home() / args.diff_to)
         elif args.backup_list:
-            call_for_each_vault(vault_paths, backup_list_operation, print)
+            call_for_each_vault(vault_paths, backup_operation, print)
         elif args.backup_remove:
-            call_for_each_vault(vault_paths, backup_list_operation, remove_item)
+            call_for_each_vault(vault_paths, backup_operation, remove_item)
         elif args.execute:
             call_for_each_vault(vault_paths, execute_command, args.execute)
         else:
