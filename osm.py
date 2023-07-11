@@ -106,7 +106,11 @@ OSM_DEFAULT_CONFIG = r'''
 
         { "copy": "snippets" },
         { "copy": "themes" }
-    ]
+    ],
+    "backup": {
+        "archive_format_priority_list": ["zip", "gztar", "bztar", "xztar", "tar"],
+        "location": ".osm-obsidian-settings-backup"
+    }
 }
 '''
 
