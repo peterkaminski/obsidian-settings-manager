@@ -404,14 +404,6 @@ def show_selected_files_for(vault):
     for a_file in get_items_to_copy(Path(vault) / '.obsidian'):
         print("   ", a_file)
 
-def backup(item, suffix):
-    '''Rename item to have the given suffix.'''
-    backup = str(item)+suffix
-    verbose('Saving current', item, 'as', backup)
-    if DRY_RUN:
-        return
-    item.rename(backup)
-
 def copy_directory(src_target, dest_target):
     '''Copy the src_target directry to dest_target.'''
     verbose('Copying directory', src_target, 'to', dest_target)
@@ -453,7 +445,7 @@ def execute_command(vault_path, command):
     else:
         subprocess.run(command, cwd=vault_path, shell=True)
 
-def copy_settings_item(suffix, src, dest, itemname):
+def copy_settings_item(src, dest, itemname):
     '''
     Copy itemname from src to dest.
 
@@ -467,8 +459,6 @@ def copy_settings_item(suffix, src, dest, itemname):
     if not src_target.exists():
         return
     verbose()
-    if dest_target.exists():
-        backup(dest_target, suffix)
     if src_target.is_dir():
         copy_directory(src_target, dest_target)
     else:
@@ -494,14 +484,11 @@ def copy_settings(dest, src, clean_first=False):
     src = src / '.obsidian'
     dest = dest / '.obsidian'
 
-    # Use a timestamp for the suffix for uniqueness
-    suffix = datestring()
-
     if clean_first:
         recreate_dir(dest)
 
     for item in get_items_to_copy(src):
-        copy_settings_item(suffix, src, dest, item)
+        copy_settings_item(src, dest, item)
 
 def do_diff(old, new):
     '''Diff two items, prefix with the diff command used.'''
