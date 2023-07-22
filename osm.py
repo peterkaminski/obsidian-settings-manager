@@ -121,10 +121,10 @@ ITEMS_TO_COPY = []  # Path() file objects; updated when FILE_ACTIONS are applied
 
 def datestring():
     '''Return the current date and time in UTC string format.'''
-    return f'-{datetime.datetime.utcnow().isoformat()}Z'
+    return datetime.datetime.utcnow().isoformat() + 'Z'
 
 # Keep this in sync with the format returned by datestring()
-ISO_8601_GLOB = '*-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'
+ISO_8601_GLOB = '*[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z*'
 
 VERBOSE = False
 DRY_RUN = False
