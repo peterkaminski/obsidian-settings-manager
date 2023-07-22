@@ -212,6 +212,8 @@ def init_argparse():
     only_one_of.add_argument('--exact-copy-of', help='delete and recreate Obsidian vaults with an exact copy of the EXACT_COPY_OF vault')
     only_one_of.add_argument('--diff-to', '-d', help='Like update but instead of copying, just show a diff against DIFF_TO instead (no changes made).')
     only_one_of.add_argument('--execute', '-x', help='run EXECUTE command within each vault (use caution!)')
+    only_one_of.add_argument('--backup-all-vaults', action="store_true", help='make a backup of the obsidian settings for all vaults')
+    only_one_of.add_argument('--backup-vault', help='make a backup of the obsidian settings for BACKUP_VAULT')
     only_one_of.add_argument('--backup-list', action='store_true', help='list ISO 8601-formatted .obsidian backup files from all vaults')
     only_one_of.add_argument('--backup-remove', action='store_true', help='remove ISO 8601-formatted .obsidian backup files from all vaults')
     only_one_of.add_argument('--show-selected', dest="from_vault", help='print the files that would be copied from FROM_VAULT to other vaults, then exit')
@@ -481,6 +483,8 @@ def copy_settings(dest, src, clean_first=False):
 
     print(f"Copying '{src}' configuration to '{dest}'")
 
+    backup_vault(dest)
+
     src = src / '.obsidian'
     dest = dest / '.obsidian'
 
@@ -531,11 +535,42 @@ def diff_settings(dest, src):
         # If neither exist, nothing to do, nothing to say. Move along.
 
 
+def backup_vault(vault_path):
+    print('#', vault_path)
+
+    vault_path = Path(vault_path)
+
+    backup_info = must_get_key(OSM_CONFIG, 'backup', 'in OSM configuration')
+    backup_dir_name = Path(must_get_key(backup_info, 'location', 'in "backup" section of OSM configuration'))
+    backup_formats = must_get_key(backup_info, 'archive_format_priority_list', 'in "backup" section of OSM configuration')
+
+    backup_from_dir = vault_path / '.obsidian'
+    backup_full_dir = Path(vault_path) / backup_dir_name
+    backup_full_dir.mkdir(exist_ok=True)
+    backup_file = Path(vault_path) / backup_dir_name / datestring()
+    for backup_format in backup_formats:
+        try:
+            backup_file = shutil.make_archive(backup_file, backup_format, root_dir=backup_from_dir)
+            if backup_file:
+                print("Backup made:", backup_file)
+                print()
+                return
+        except ValueError:
+            pass  # Not a supported format, keep checking.
+
+    print("Unable to make backup of", vault_path, "in any format:", ", ".join(map(repr, backup_formats)))
+    exit(-1)
+
 def backup_operation(vault_path, operation):
     '''Call operation with each backup item found in the given vault.'''
-    dir_path = Path(vault_path) / '.obsidian'
+    backup_info = must_get_key(OSM_CONFIG, 'backup', 'in OSM configuration')
+    backup_dir = Path(must_get_key(backup_info, 'location', 'in "backup" section of OSM configuration'))
+
+    print(f'# {vault_path}')
+    dir_path = Path(vault_path) / backup_dir
     for dest in dir_path.glob(ISO_8601_GLOB):
         operation(dest)
+    print()
 
 def show_vault_path(vault_path):
     '''Print the vault path relative to the user's home directory (more readable).'''
@@ -593,6 +628,11 @@ def main():
         elif args.diff_to:
             ensure_valid_vault(vault_paths, args.diff_to)
             call_for_each_vault(vault_paths, diff_settings, Path.home() / args.diff_to)
+        elif args.backup_all_vaults:
+            call_for_each_vault(vault_paths, backup_vault)
+        elif args.backup_vault:
+            ensure_valid_vault(vault_paths, args.backup_vault)
+            backup_vault(Path.home() / args.backup_vault)
         elif args.backup_list:
             call_for_each_vault(vault_paths, backup_operation, print)
         elif args.backup_remove:
