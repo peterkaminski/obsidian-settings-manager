@@ -536,7 +536,7 @@ def diff_settings(dest, src):
 
 
 def backup_vault(vault_path):
-    print('#', vault_path)
+    print(f'# Backing up settings for: {vault_path}')
 
     vault_path = Path(vault_path)
 
@@ -550,10 +550,10 @@ def backup_vault(vault_path):
     backup_file = Path(vault_path) / backup_dir_name / datestring()
     for backup_format in backup_formats:
         try:
-            backup_file = shutil.make_archive(backup_file, backup_format, root_dir=backup_from_dir)
+            backup_file = shutil.make_archive(backup_file, backup_format, root_dir=backup_from_dir, dry_run=DRY_RUN)
             if backup_file:
-                print("Backup made:", backup_file)
-                print()
+                verbose("Backup file:", backup_file)
+                verbose()
                 return
         except ValueError:
             pass  # Not a supported format, keep checking.
