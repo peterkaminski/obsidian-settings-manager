@@ -189,6 +189,7 @@ Bug reports, enhancement suggestions, and pull requests are welcome at the [Obsi
 Here are some possible enhancements already contemplated.
 
 - List details of vault plugins, snippets, config.
+    - workaround for community plugins: `./osm.py -x 'cat .obsidian/community-plugins.json'`
 - More fine-grained control over which files and directories are copied, and which destination vaults they are copied to. This would replace the `ITEMS_TO_COPY` global.
   - Use `--input` / `-i` to specify a file that contains vault paths, instead of reading the vault paths from Obsidian.
   - Use `--config` / `-c` to specify a YAML file which specifies which files and directories to copy.
@@ -198,6 +199,7 @@ Here are some possible enhancements already contemplated.
 - `--backup-create` - just back up files without doing `--update`
 - `--backup-restore ISO_8601_DATE` - restore from backup files
 - Output commands to run on the OS's CLI, rather than actually executing or dry-running actions.
+- Alpha-sort the vaults in `obsidian.json` (by changing `ts`)
 
 ## Contributors
 
@@ -208,7 +210,7 @@ Obsidian Settings Manager is open source. Pull requests and suggestions are grat
 
 ## MIT License
 
-Copyright (c) 2021-2023 Peter Kaminski
+Copyright (c) 2021-2024 Peter Kaminski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
